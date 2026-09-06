@@ -61,6 +61,23 @@ Deeper check (SPEC §6): each block compiles to a **WELL-FORMED** Loomground `.l
 validator (schema-passing is necessary, not sufficient). The role governance behaviour is proven against
 the real `rvnd.action_gate` (see the proofs in the session scratchpad).
 
+## Known enforcement limits (REV1 pentest, 2026-09-06 — read before relying on the gate)
+The "RVND enforces each role's block" claim rests on **two** layers, and one has a hole:
+- **PreToolUse hook** — REV1 found the hook classifier assigns an **empty footprint to every `mcp__*`,
+  `WebFetch`, and `WebSearch` call**, so the hook's fast-benign path returns *allow* **without calling
+  `action_gate`**. So the **hook layer does not gate the MCP door** (or WebFetch/WebSearch) — a role's
+  MCP-door acts, and any tool in those classes, are **not** gated by the hook, even at L2.
+- **RVND MCP server** — the `workspace_*` tools gate server-side. Enforcement of the MCP-door acts
+  therefore rests on **that** gate, not the hook. **Verify server-side coverage** for the specific
+  `workspace_*` tools a role uses before treating an MCP-door act as gated; do not assume the hook covers it.
+- **Egress** is not contained at the code layer — the import guard is a **CI-only static AST scan, no
+  runtime block**. Cloud-LLM/egress containment is load-bearing **only with the D4 OS firewall applied**
+  (a reserved deploy step). The bundled skill door remains fail-closed (signs/egresses nothing) regardless.
+
+Net: the **bundled-door fail-closed HOLDs and the `prohibited`/`reserved` severing are sound**; the gap is
+that per-tool *hook* gating does not cover the MCP/WebFetch/WebSearch classes, and egress needs D4. Track
+the fixes in the readiness spine (REV1).
+
 ## Reserved (a human's act, never the installer's, never the assistant's)
 Anything that **grants authority or changes security posture** stays a reserved act you run:
 - registering a *governed agent lane* at a granted grade (`governance_lane_register`, carries
