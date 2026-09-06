@@ -8,7 +8,7 @@ Run: `python3 build_role_skills.py`  (idempotent). Then `validate_role_skills.py
 from __future__ import annotations
 from pathlib import Path
 
-OUT = Path(__file__).resolve().parent.parent / "skills"
+from .stamp import canonical_hash, stamp_line
 
 # Each role: dict with the governance-block fields in STRUCTURED form (schema-correct).
 # action = (kind, risk[, grade]); reserved = (kind, by_yaml); redress = (kind, by, overturn, within|None)
@@ -141,13 +141,19 @@ def _governance(role) -> str:
     return g
 
 
-def build():
+def build(root: Path | None = None):
+    """EMIT skills/<role>/SKILL.md under `root` (default CWD). Every file is stamped with
+    tool+version+input_sha256; the input is the role's canonical source. L0: emits a diff, never
+    auto-applies — a human reviews and lands it."""
+    out = Path(root or Path.cwd()).resolve() / "skills"
     written = []
     for role in ROLES:
-        d = OUT / role["name"]; d.mkdir(parents=True, exist_ok=True)
+        input_sha256 = canonical_hash(role)
+        d = out / role["name"]; d.mkdir(parents=True, exist_ok=True)
         desc = role["purpose"].replace('"', "'")   # quote-safe: descriptions carry colons
         fm = (f"---\nname: {role['name']}\n"
               f"description: \"{desc}\"\n"
+              f"provenance: {{ stamp: \"{stamp_line(input_sha256)}\" }}\n"
               f"{_governance(role)}"
               "---\n")
         body = (f"\n# {role['name']}\n\n**Plane:** {role['plane']}\n\n{role['purpose']}\n\n"
@@ -159,10 +165,15 @@ def build():
                 "agent-registry records. Reserved acts hold for a human; prohibited kinds are severed "
                 "regardless of grade.\n")
         (d / "SKILL.md").write_text(fm + body, encoding="utf-8")
-        written.append(str((d / "SKILL.md").relative_to(OUT.parent)))
+        rel = (d / "SKILL.md").relative_to(out.parent)
+        written.append(str(rel))
+        print("built (emitted, review the diff)", rel)
     return written
 
 
+def main(root: Path | None = None):
+    return build(root)
+
+
 if __name__ == "__main__":
-    for p in build():
-        print("wrote", p)
+    main()

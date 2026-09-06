@@ -1,0 +1,9 @@
+{
+  "artefact": "governance-block.schema.json",
+  "source_repo": "https://github.com/flxk1/skill-governance-block.git",
+  "source_path": "schema/governance-block.schema.json",
+  "source_commit": "2a2c52dfb0701c829d30d5909d8e6d459c4e9924",
+  "sha256": "1171cb00bb321a0143193d7cdc29d5af659092f21578677621ab760dce510d2b",
+  "bundled_by": "governance-layer",
+  "note": "Vendored copy of the skill-governance-block JSON schema, resolved at runtime via importlib.resources (never a sibling-path lookup). Refresh is a reviewed L1 diff; re-run the provenance check after any refresh."
+}

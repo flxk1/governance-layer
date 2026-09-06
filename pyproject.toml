@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "governance-layer"
+version = "0.1.0"
+description = "The skill-governance-block toolchain: build/compile/validate governed role packages (L0)."
+readme = "README.md"
+requires-python = ">=3.11"
+license = "Apache-2.0"
+authors = [{ name = "flxk1", email = "flxk1@users.noreply.github.com" }]
+dependencies = [
+  "pyyaml>=6",
+  "jsonschema>=4",
+]
+
+[project.scripts]
+governance-layer = "governance_layer.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+governance_layer = ["schema/*.json", "schema_provenance.json"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
