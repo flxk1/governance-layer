@@ -1,0 +1,32 @@
+{
+  "name": "loomground-governance",
+  "owner": {
+    "name": "Loomground Contributors"
+  },
+  "metadata": {
+    "description": "loomground-governance — the seven governed roles as install-ready skills, each carrying a skill-governance-block that RVND enforces.",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "loomground-governance-roles",
+      "source": "./",
+      "version": "0.1.0",
+      "description": "Seven governed roles (grounder, legal-reasoner, knowledge-steward, lock-steward, policy-officer, auditor, local-grounder). Each skill's governance block is enforced by RVND via action_gate; the official/private firewall keeps the product on official versum only.",
+      "author": {
+        "name": "Loomground Contributors"
+      },
+      "license": "Apache-2.0",
+      "keywords": [
+        "governance",
+        "loomground",
+        "rvnd",
+        "roles",
+        "skill-governance-block",
+        "egress-lock",
+        "grounding",
+        "legal"
+      ]
+    }
+  ]
+}
