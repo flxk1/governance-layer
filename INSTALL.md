@@ -61,22 +61,30 @@ Deeper check (SPEC §6): each block compiles to a **WELL-FORMED** Loomground `.l
 validator (schema-passing is necessary, not sufficient). The role governance behaviour is proven against
 the real `rvnd.action_gate` (see the proofs in the session scratchpad).
 
-## Known enforcement limits (REV1 pentest, 2026-09-06 — read before relying on the gate)
-The "RVND enforces each role's block" claim rests on **two** layers, and one has a hole:
-- **PreToolUse hook** — REV1 found the hook classifier assigns an **empty footprint to every `mcp__*`,
-  `WebFetch`, and `WebSearch` call**, so the hook's fast-benign path returns *allow* **without calling
-  `action_gate`**. So the **hook layer does not gate the MCP door** (or WebFetch/WebSearch) — a role's
-  MCP-door acts, and any tool in those classes, are **not** gated by the hook, even at L2.
-- **RVND MCP server** — the `workspace_*` tools gate server-side. Enforcement of the MCP-door acts
-  therefore rests on **that** gate, not the hook. **Verify server-side coverage** for the specific
-  `workspace_*` tools a role uses before treating an MCP-door act as gated; do not assume the hook covers it.
-- **Egress** is not contained at the code layer — the import guard is a **CI-only static AST scan, no
-  runtime block**. Cloud-LLM/egress containment is load-bearing **only with the D4 OS firewall applied**
-  (a reserved deploy step). The bundled skill door remains fail-closed (signs/egresses nothing) regardless.
+## Known enforcement limits (REV1 pentest + 2-lane egress verification, 2026-09-06 — VERIFIED on origin/main 5dceee6)
+The "RVND enforces each role's block" claim rests on **two** layers. Two separate limits, keep them apart:
 
-Net: the **bundled-door fail-closed HOLDs and the `prohibited`/`reserved` severing are sound**; the gap is
-that per-tool *hook* gating does not cover the MCP/WebFetch/WebSearch classes, and egress needs D4. Track
-the fixes in the readiness spine (REV1).
+- **Empty-footprint hook hole — a REAL engine gap (not by-design).** The PreToolUse hook's `classify()` does
+  not model MCP-tool / WebFetch / WebSearch danger, so those get an **empty footprint** and the fast-benign
+  path returns **ALLOW without ever reaching `action_gate`** — a silent `sys.exit(0)` permit. Offense proved
+  it live at L2: `mcp__rvnd__workspace_erase`, a gmail send, a slack post, a WebFetch to an exfil URL, and
+  WebSearch **all returned ALLOW, gate never called.** Worse than "not gated": under `RVND_HOOK_STRICT=1`
+  those same calls return **ASK (human sign-off)**, so the fast-benign path **downgrades ASK → ALLOW,
+  stripping the sign-off** (the in-code "loses nothing" comment is refuted on this build). So do **not** rely
+  on the hook to gate a role's MCP-door acts or any WebFetch/WebSearch — enforcement of the MCP door rests on
+  the **RVND MCP server's own server-side gate** (verify per `workspace_*` tool). *Incidental:* the
+  Bash/irreversible path **does** enforce (a live `rm` probe was blocked); the gap is specific to the
+  empty-footprint tool families. Recommended engine fix: model those families in `classify()`, or don't
+  fast-benign them.
+- **Egress is Tier-gated BY DESIGN (not a flaw).** The import guard is a **CI-only static scan with no
+  runtime block** — but that is the documented tiering (`docs/concepts/air-gap-enforcement.md`): default
+  install = Tier 1; load-bearing egress containment = the **operator OS firewall (Tier 3 / D4)**, a reserved
+  deploy step. Treat cloud-LLM/egress containment as guaranteed **only with D4 applied**, not at the code layer.
+
+Net: the **bundled-door fail-closed HOLDs and the `prohibited`/`reserved` severing are sound**, and the
+Bash/irreversible path is gated. The gaps: (1) the hook does not gate — and actively downgrades ASK→ALLOW for
+— the MCP/WebFetch/WebSearch classes (rely on the server-side gate; engine follow-up filed to the spine),
+and (2) egress containment needs the D4 firewall. Track both in the readiness spine.
 
 ## Reserved (a human's act, never the installer's, never the assistant's)
 Anything that **grants authority or changes security posture** stays a reserved act you run:
