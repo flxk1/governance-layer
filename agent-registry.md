@@ -14,6 +14,12 @@ Append-only. One row per role that acts without per-step human approval. This is
 **derived** from the role's `governance` block in `roles.md`; the brief lives in
 `agents/<id>.md`.
 
+**Exception — meta-rows (no `roles.md` block):** `governance-layer-toolchain` is an **L0 meta-tool**
+that *builds* the role blocks (SKILL.md + `.lg`) rather than being one of the governed roles. It has no
+`## ROLE` block in `roles.md` and no `.lg` — it is governed **brief-only** (`agents/governance-layer-toolchain.md`),
+grade-capped at L0 by construction (not an agent key). So the registry may carry more rows than `roles.md`
+has ROLE blocks: the 7 governed roles derive from `roles.md`; a meta-row derives from its brief alone.
+
 - **Grade** = the block's `grade:` floor (per-action grades raise specific acts above it).
 - **Purpose** = the role's own description.
 - **Kill switch** = the enforcer's grade gate grounded in real RVND `agent_keys` code —
