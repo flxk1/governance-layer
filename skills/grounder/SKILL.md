@@ -1,6 +1,7 @@
 ---
 name: grounder
-description: "Read-only evidence at coordinate + provenance, or ground-or-escalate. Serves; never writes. Product grounder — official versum only."
+description: "Read-only evidence at coordinate + provenance, or ground-or-escalate. Serves; never writes. Product grounder — official versum only. Use when a claim must be grounded against the official versum — 'ground this', 'is this in the corpus', 'give me the source for X at date D', 'confirm this against the graph'."
+metadata: { provenance: { stamp: "tool=governance-layer version=0.1.0 input_sha256=678f14e16540866184f1de7f4a8070e048ca5ee57e1c44b1799d28f3a85dc8b0" } }
 governance:
   grade: L2
   actions:

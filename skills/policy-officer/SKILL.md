@@ -1,6 +1,7 @@
 ---
 name: policy-officer
-description: "versum-policy to validated .lg to a human applying it. Makes known policy enforced. Know real-time; enforce-a-change reserved."
+description: "versum-policy to validated .lg to a human applying it. Makes known policy enforced. Know real-time; enforce-a-change reserved. Use when a known policy must become enforced — 'compile this policy to .lg', 'validate this patch', 'apply this patch', 'rebind the lane'."
+metadata: { provenance: { stamp: "tool=governance-layer version=0.1.0 input_sha256=17271c186354d362a342e7614286b6e1d7785b6c6a7cfa96c077bd9cd0c9ccff" } }
 governance:
   grade: L2
   actions:

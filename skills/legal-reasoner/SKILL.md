@@ -1,6 +1,7 @@
 ---
 name: legal-reasoner
-description: "Grounded premises to a warranted conclusion (apply, in-force, conflict, effect, deontic). Calls grounder first; enacts nothing alone."
+description: "Grounded premises to a warranted conclusion (apply, in-force, conflict, effect, deontic). Calls grounder first; enacts nothing alone. Use when grounded premises must be argued to a conclusion — 'what follows from these provisions', 'is this permitted / obligatory / forbidden', 'which norm wins', 'how likely is liability'."
+metadata: { provenance: { stamp: "tool=governance-layer version=0.1.0 input_sha256=bbaa0f380eaad70d6ff20292ef71c3b9c3bfe8c9009885a6ac1bb8ae20a404b2" } }
 governance:
   grade: L2
   actions:

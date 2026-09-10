@@ -1,6 +1,7 @@
 ---
 name: lock-steward
-description: "Provisions and discharges the per-folder egress lock (Privacy Lock). Manages the lock, never exempt. Ratchet + fail-secure."
+description: "Provisions and discharges the per-folder egress lock (Privacy Lock). Manages the lock, never exempt. Ratchet + fail-secure. Use when a folder's egress lock must be provisioned, checked, raised, lowered, or unsealed — 'lock this folder', 'lock status', 'egress-check this payload', 'unseal'."
+metadata: { provenance: { stamp: "tool=governance-layer version=0.1.0 input_sha256=b866f9c9d393af150b8618124e4c00c62804677336f1f2d3e074622b47843ccb" } }
 governance:
   grade: L2
   actions:

@@ -1,6 +1,7 @@
 ---
 name: local-grounder
-description: "Grounds Felix's own work over his private knowledge folder. Firewalled from the product: never ships, never a product dependency, output never reaches the official versum."
+description: "Grounds Felix's own work over his private knowledge folder. Firewalled from the product: never ships, never a product dependency, output never reaches the official versum. Use when Felix's own work must be grounded over his private knowledge folder — 'ground this against my private notes', 'read my private evidence'."
+metadata: { provenance: { stamp: "tool=governance-layer version=0.1.0 input_sha256=c0360c354fff19b2491a49835ffc6d38420c39c0d6bd676369c38381fd526a47" } }
 governance:
   grade: L2
   actions:

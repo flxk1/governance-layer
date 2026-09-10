@@ -1,6 +1,7 @@
 ---
 name: knowledge-steward
-description: "Build and maintain the graph: ingest, concepts, placement, write, curate; enrich; erase. The one write/erase authority."
+description: "Build and maintain the graph: ingest, concepts, placement, write, curate; enrich; erase. The one write/erase authority. Use when material must enter, be curated in, or be erased from the graph — 'ingest this', 'add what we learned to the graph', 'curate the concepts', 'erase this subject'."
+metadata: { provenance: { stamp: "tool=governance-layer version=0.1.0 input_sha256=200df2818a0a6de97d864ee96617fba3084323d2b60a3a947f028cd7eed2eccf" } }
 governance:
   grade: L2
   actions:

@@ -15,6 +15,7 @@ from .stamp import canonical_hash, stamp_line
 ROLES = [
  {"name": "grounder", "plane": "Loomground · ground (product)",
   "purpose": "Read-only evidence at coordinate + provenance, or ground-or-escalate. Serves; never writes. Product grounder — official versum only.",
+  "use_when": "Use when a claim must be grounded against the official versum — 'ground this', 'is this in the corpus', 'give me the source for X at date D', 'confirm this against the graph'.",
   "grade": "L2",
   "actions": [("ground_query","low"),("read_evidence","low"),("emit_provenance_receipt","medium","L3")],
   "reserved": [],
@@ -27,6 +28,7 @@ ROLES = [
 
  {"name": "legal-reasoner", "plane": "Loomground · reason",
   "purpose": "Grounded premises to a warranted conclusion (apply, in-force, conflict, effect, deontic). Calls grounder first; enacts nothing alone.",
+  "use_when": "Use when grounded premises must be argued to a conclusion — 'what follows from these provisions', 'is this permitted / obligatory / forbidden', 'which norm wins', 'how likely is liability'.",
   "grade": "L2",
   "actions": [("warrant_conclusion","medium"),("quantify_exposure","medium"),("emit_lg_patch","high","L3"),("release_disposition","critical","L4")],
   "reserved": [("release_disposition","{ quorum: 2, of: [legal_reviewer, policy_owner] }")],
@@ -39,6 +41,7 @@ ROLES = [
 
  {"name": "knowledge-steward", "plane": "Loomground · curate",
   "purpose": "Build and maintain the graph: ingest, concepts, placement, write, curate; enrich; erase. The one write/erase authority.",
+  "use_when": "Use when material must enter, be curated in, or be erased from the graph — 'ingest this', 'add what we learned to the graph', 'curate the concepts', 'erase this subject'.",
   "grade": "L2",
   "actions": [("ingest_dryrun","low"),("extract_concepts","low"),("propose_placement","medium"),("graph_write","high","L3"),("curate_canon","high","L3"),("graph_erase","critical","L4")],
   "reserved": [("graph_erase","{ all: [data_protection_officer, workspace_owner] }"),("curate_canon","curator")],
@@ -51,6 +54,7 @@ ROLES = [
 
  {"name": "lock-steward", "plane": "RVND · secure",
   "purpose": "Provisions and discharges the per-folder egress lock (Privacy Lock). Manages the lock, never exempt. Ratchet + fail-secure.",
+  "use_when": "Use when a folder's egress lock must be provisioned, checked, raised, lowered, or unsealed — 'lock this folder', 'lock status', 'egress-check this payload', 'unseal'.",
   "grade": "L2",
   "actions": [("lock_status","low"),("classify_content","low"),("propose_lock_profile","medium"),("egress_check","medium"),("ingress_check","medium"),("provision_lock","high","L3"),("raise_threshold","high","L3"),("lower_threshold","critical","L4"),("downgrade_backend","critical","L4"),("unseal","critical","L4")],
   "reserved": [("provision_lock","workspace_owner"),("lower_threshold","{ all: [workspace_owner, data_protection_officer] }"),("downgrade_backend","{ all: [workspace_owner, data_protection_officer] }"),("unseal","workspace_owner")],
@@ -63,6 +67,7 @@ ROLES = [
 
  {"name": "policy-officer", "plane": "Loomground to RVND · govern",
   "purpose": "versum-policy to validated .lg to a human applying it. Makes known policy enforced. Know real-time; enforce-a-change reserved.",
+  "use_when": "Use when a known policy must become enforced — 'compile this policy to .lg', 'validate this patch', 'apply this patch', 'rebind the lane'.",
   "grade": "L2",
   "actions": [("ground_policy","low"),("compile_lg_twin","medium"),("validate_patch","low"),("apply_patch","critical","L4"),("rebind_lane","high","L3")],
   "reserved": [("apply_patch","workspace_owner"),("rebind_lane","workspace_owner")],
@@ -75,6 +80,7 @@ ROLES = [
 
  {"name": "auditor", "plane": "RVND · audit",
   "purpose": "Read-only over the signed chain (verify_chain/tail/shadow_scan/discipline). Writes nothing but an attributed override. Reports, never repairs.",
+  "use_when": "Use when the signed chain must be verified or reported on — 'verify the chain', 'tail the chain', 'shadow scan', 'discipline check', 'record an override'.",
   "grade": "L2",
   "actions": [("verify_chain","low"),("tail_chain","low"),("get_event","low"),("shadow_scan","low"),("discipline","low"),("record_override","medium")],
   "reserved": [],
@@ -87,6 +93,7 @@ ROLES = [
 
  {"name": "local-grounder", "plane": "Loomground · ground (private) — LOCAL-ONLY",
   "purpose": "Grounds Felix's own work over his private knowledge folder. Firewalled from the product: never ships, never a product dependency, output never reaches the official versum.",
+  "use_when": "Use when Felix's own work must be grounded over his private knowledge folder — 'ground this against my private notes', 'read my private evidence'.",
   "grade": "L2",
   "actions": [("ground_private","low"),("read_private_evidence","low")],
   "reserved": [],
@@ -150,10 +157,10 @@ def build(root: Path | None = None):
     for role in ROLES:
         input_sha256 = canonical_hash(role)
         d = out / role["name"]; d.mkdir(parents=True, exist_ok=True)
-        desc = role["purpose"].replace('"', "'")   # quote-safe: descriptions carry colons
+        desc = f"{role['purpose']} {role['use_when']}".replace('"', "'")   # quote-safe: descriptions carry colons
         fm = (f"---\nname: {role['name']}\n"
               f"description: \"{desc}\"\n"
-              f"provenance: {{ stamp: \"{stamp_line(input_sha256)}\" }}\n"
+              f"metadata: {{ provenance: {{ stamp: \"{stamp_line(input_sha256)}\" }} }}\n"
               f"{_governance(role)}"
               "---\n")
         body = (f"\n# {role['name']}\n\n**Plane:** {role['plane']}\n\n{role['purpose']}\n\n"

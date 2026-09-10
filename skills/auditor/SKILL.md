@@ -1,6 +1,7 @@
 ---
 name: auditor
-description: "Read-only over the signed chain (verify_chain/tail/shadow_scan/discipline). Writes nothing but an attributed override. Reports, never repairs."
+description: "Read-only over the signed chain (verify_chain/tail/shadow_scan/discipline). Writes nothing but an attributed override. Reports, never repairs. Use when the signed chain must be verified or reported on — 'verify the chain', 'tail the chain', 'shadow scan', 'discipline check', 'record an override'."
+metadata: { provenance: { stamp: "tool=governance-layer version=0.1.0 input_sha256=672bbe3b544ccdee1e1d453787f565a8fd7bebb57e9e46b4a761a046e1405af9" } }
 governance:
   grade: L2
   actions:
