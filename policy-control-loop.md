@@ -48,7 +48,7 @@ real-time ingest can make policy *known* — it cannot silently change what is *
 
 ## Security-by-design invariants
 - **KNOW is real-time, ENFORCE-a-change is reserved.** `policy_ingest`/`governance_chat` apply **nothing**
-  until a human `patch_apply` (stage 5). Ingestion can inform, never silently enforce.
+  until a human applies the patch (stage 5). Ingestion can inform, never silently enforce.
 - **No silent disable.** Turning a protection off needs `accepted_by` + `reason`, recorded at the
   enforcement host; the policy-officer's `silent_disable` is prohibited.
 - **Validated before applied.** Only a `patch_validate`-clean twin may be applied (`enforce_unvalidated`

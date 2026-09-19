@@ -45,7 +45,7 @@ to a new policy. No cron (the real-time *feed* that notices new policy is LG2, s
 1. *Silent enforce* — policy changed without a human. Symptom: an applied patch with no owner sign-off.
    Blast radius: the gate silently enforces (or stops enforcing) something no human chose. Notices:
    `auto_apply_policy` prohibited + `human_confirm_before_apply` + the reserved `apply_patch` gate.
-2. *Unvalidated patch* — an ill-formed `.lg` reaches the chain. Symptom: `patch_apply` without a prior
+2. *Unvalidated patch* — an ill-formed `.lg` reaches the chain. Symptom: the patch is applied without a prior
    `patch_validate` pass. Blast radius: a broken policy graph. Notices: `enforce_unvalidated` prohibited +
    `validated_before_apply`.
 3. *Authority creep* — the officer widens who may act. Symptom: a patch that grants (not just tightens)
@@ -54,7 +54,7 @@ to a new policy. No cron (the real-time *feed* that notices new policy is LG2, s
 ## 3am worst-case
 Running amok, it **cannot change what is enforced**: `apply_patch` is **L4 + reserved** to the workspace
 owner and `human_confirm_before_apply` means `policy_ingest`/`governance_chat` apply **nothing** until a
-human `patch_apply`; `rebind_lane` is L3 + reserved; both are fail-closed HOLDs on any bundled path. It
+human application of the patch; `rebind_lane` is L3 + reserved; both are fail-closed HOLDs on any bundled path. It
 **cannot apply garbage** (`enforce_unvalidated` prohibited; `validated_before_apply`), **cannot widen
 authority** (`self_widen_authority` prohibited — tighten-only), and **cannot silently disable** a
 protection (`silent_disable` prohibited — accepted_by + reason). The worst it can do unattended is

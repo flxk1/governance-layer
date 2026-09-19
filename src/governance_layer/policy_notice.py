@@ -2,7 +2,7 @@
 
 Fires when policy is ingested/changed in versum and ROUTES a notice to the policy-officer.
 It is a WATCH, not an actor: it never fetches in-session, never compiles a .lg twin, and never
-applies policy. NOTICE is real-time; ENFORCE-a-change stays the reserved human patch_apply
+applies policy. NOTICE is real-time; ENFORCE-a-change stays the reserved human application of the patch
 downstream (policy-officer). Fail-closed: unconfirmed policy is HELD (noticed, not routed);
 a malformed item is quarantined; a repeal is flagged for retire (tighten), never auto-removed.
 
