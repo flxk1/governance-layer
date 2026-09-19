@@ -1,9 +1,11 @@
 # Governance Layer
 
-Turns the **universal loomground skills** into **governed roles**, and gives every governed act its
-**authoritative signed door**. This is the enforcement plane — separate from Loomground
-(grounding) and ctrl (orchestration). *"Loomground is universal; via an enforcement host and
-ctrl:legal these skills become governance capabilities."*
+Turn universal loomground skills into governed roles, each carrying the governance block an enforcement host reads.
+
+Every governed act gets its **authoritative signed door**. This is the enforcement
+plane — separate from Loomground (grounding) and ctrl (orchestration).
+*"Loomground is universal; via an enforcement host and ctrl:legal these skills
+become governance capabilities."*
 
 ## The move
 A loomground skill is universal and carries no authority. Bind it a **governance-block** and it
