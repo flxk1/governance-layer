@@ -1,7 +1,7 @@
 ---
 name: lock-steward
 description: "Provisions and discharges the per-folder egress lock (Privacy Lock). Manages the lock, never exempt. Ratchet + fail-secure. Use when a folder's egress lock must be provisioned, checked, raised, lowered, or unsealed — 'lock this folder', 'lock status', 'egress-check this payload', 'unseal'."
-metadata: { provenance: { stamp: "tool=governance-layer version=0.1.0 input_sha256=b866f9c9d393af150b8618124e4c00c62804677336f1f2d3e074622b47843ccb" } }
+metadata: { provenance: { stamp: "tool=governance-layer version=0.1.0 input_sha256=a1a3818d80cf91346244edd953772c16f4f08ea547af05ee8d01653566f427ba" } }
 governance:
   grade: L2
   actions:
@@ -42,11 +42,11 @@ governance:
 
 # lock-steward
 
-**Plane:** RVND · secure
+**Plane:** secure (host-enforced)
 
 Provisions and discharges the per-folder egress lock (Privacy Lock). Manages the lock, never exempt. Ratchet + fail-secure.
 
-**Doors.** MCP: workspace_lock (setup/threshold/seal/classify/egress_check/ingress_check/audit_query). Mutations signed + reserved; bundled door HOLDs.
+**Doors.** Host: an egress-lock interface (setup/threshold/seal/classify/egress_check/ingress_check/audit_query). Mutations signed + reserved; bundled door HOLDs.
 
 ## Governance identity
-The `governance:` block above is the whole of this skill's authority. A skill is universal; the block turns it into a governed **role** that ctrl plans on and **RVND enforces** (signed `action_gate.gate` -> GO / CONDITIONAL / NO-GO on the Ed25519 chain), and the agent-registry records. Reserved acts hold for a human; prohibited kinds are severed regardless of grade.
+The `governance:` block above is the whole of this skill's authority. A skill is universal; the block turns it into a governed **role** that ctrl plans on and an **enforcement host enforces** (a signed verdict on the host's hash-chain -- auto / human / reserved / prohibited, joined strictest-wins), and the agent-registry records. Reserved acts hold for a human; prohibited kinds are severed regardless of grade.

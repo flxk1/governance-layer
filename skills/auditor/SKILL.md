@@ -1,7 +1,7 @@
 ---
 name: auditor
 description: "Read-only over the signed chain (verify_chain/tail/shadow_scan/discipline). Writes nothing but an attributed override. Reports, never repairs. Use when the signed chain must be verified or reported on — 'verify the chain', 'tail the chain', 'shadow scan', 'discipline check', 'record an override'."
-metadata: { provenance: { stamp: "tool=governance-layer version=0.1.0 input_sha256=672bbe3b544ccdee1e1d453787f565a8fd7bebb57e9e46b4a761a046e1405af9" } }
+metadata: { provenance: { stamp: "tool=governance-layer version=0.1.0 input_sha256=af3a23ab07bc7db6100039b975b9a9ab081f2c696451f9a8c759f425144c21b5" } }
 governance:
   grade: L2
   actions:
@@ -30,11 +30,11 @@ governance:
 
 # auditor
 
-**Plane:** RVND · audit
+**Plane:** audit (host-enforced)
 
 Read-only over the signed chain (verify_chain/tail/shadow_scan/discipline). Writes nothing but an attributed override. Reports, never repairs.
 
-**Doors.** MCP: workspace_audit (verify_chain/tail/get_event/shadow_scan/discipline/overrides/record_override). record_override is the only append.
+**Doors.** Host: a read-only audit interface (verify/tail/get-event/shadow-scan/discipline/overrides/record-override). record_override is the only append.
 
 ## Governance identity
-The `governance:` block above is the whole of this skill's authority. A skill is universal; the block turns it into a governed **role** that ctrl plans on and **RVND enforces** (signed `action_gate.gate` -> GO / CONDITIONAL / NO-GO on the Ed25519 chain), and the agent-registry records. Reserved acts hold for a human; prohibited kinds are severed regardless of grade.
+The `governance:` block above is the whole of this skill's authority. A skill is universal; the block turns it into a governed **role** that ctrl plans on and an **enforcement host enforces** (a signed verdict on the host's hash-chain -- auto / human / reserved / prohibited, joined strictest-wins), and the agent-registry records. Reserved acts hold for a human; prohibited kinds are severed regardless of grade.

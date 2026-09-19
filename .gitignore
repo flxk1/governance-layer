@@ -7,3 +7,9 @@ build/
 dist/
 *.egg-info/
 .pytest_cache/
+
+# working docs bound to the private enforcement host's internal implementation
+# (module paths, MCP tool names, version pins) -- not publication-safe; stay local
+mcp-door-map.md
+rvnd-governance-team.md
+runbooks/rv3-provision-real-backend.md

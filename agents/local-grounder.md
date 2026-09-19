@@ -63,10 +63,11 @@ nothing and writes nothing. The worst it can do unattended is **read Felix's own
 own reasoning** — locally, crossing nothing. The 3am answer is acceptable *because* the firewall is
 two-sided and severed, not because the role is trusted with the private material.
 
-## Kill switch (real RVND code)
-`revoke_agent_key(keyid)` in `rvnd/agent_keys.py` stops any signed act (it signs none anyway); flooring the
-grade leaves it at local reads only. The firewall prohibitions (`feed_product_grounding`,
-`write_to_official_versum`, `egress_private_content`, `ship`) stay **severed** regardless of grade.
+## Kill switch
+Revoking the role's signing key at the enforcement host stops any signed act (it signs none
+anyway); flooring the grade leaves it at local reads only. The firewall prohibitions
+(`feed_product_grounding`, `write_to_official_versum`, `egress_private_content`, `ship`) stay
+**severed** regardless of grade.
 
 ## Audit trail
 Local reads only; it appends nothing to a chain and writes no versum. Its non-existence in the product's

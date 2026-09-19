@@ -1,7 +1,7 @@
 # Policy officer
 
 **ID:** policy-officer
-**Skill:** loomground `governance` (`loomground-governance:loomground`) + RVND `workspace_workflow`/`workspace_policy`
+**Skill:** loomground `governance` (`loomground-governance:loomground`) + an enforcement host's policy-workflow interface
 **Owner:** Felix (flxk1)
 **Autonomy grade:** L2 — ground/compile/validate runs unattended; apply held to L4, rebind to L3
 **Last reviewed:** 2026-09-04
@@ -26,10 +26,11 @@ to a new policy. No cron (the real-time *feed* that notices new policy is LG2, s
 ## Grade — unattended vs held
 - **Unattended (L2):** `ground_policy`, `compile_lg_twin`, `validate_patch` — produce a **draft twin**
   (`applied:false`).
-- **Held (L3, MCP-only signed):** `rebind_lane` → `governance_open` mints a capability bound to the new
+- **Held (L3, host-only signed):** `rebind_lane` → the host mints a capability bound to the new
   `policy_fingerprint`.
-- **Held (L4, MCP-only signed, reserved):** `apply_patch` → `patch_apply` writes the policy to the signed
-  chain — the act that changes what the gate enforces. On the bundled door both are fail-closed HOLDs.
+- **Held (L4, host-only signed, reserved):** `apply_patch` → writes the policy to the signed
+  chain — the act that changes what the gate enforces. On any offline/bundled door both are
+  fail-closed HOLDs.
 
 ## Reserved / Prohibited (from the block)
 - **Reserved:** `apply_patch` + `rebind_lane` to `workspace_owner` (the human who confirms the enforced change).
@@ -60,16 +61,17 @@ protection (`silent_disable` prohibited — accepted_by + reason). The worst it 
 **ground**, **compile a draft twin**, and **validate** it — a proposal, enforcing nothing. The 3am answer
 is acceptable *because* the enforce-a-change step is reserved to a human, not because the role is trusted.
 
-## Kill switch (real RVND code)
-`revoke_agent_key(keyid)` in `rvnd/agent_keys.py` → its signed `apply_patch` (chain write) + `rebind_lane`
-stop (`get_agent_key` → `None`). And/or **floor the granted grade** → the role is reduced to ground/compile/
-validate (draft twins only); no policy reaches the chain. `apply_patch`/`rebind_lane` stay **reserved** and
-the apply-path prohibitions stay **severed** regardless of grade.
+## Kill switch
+Revoking the role's signing key at the enforcement host stops its signed `apply_patch` (chain
+write) + `rebind_lane` acts. And/or **floor the granted grade** → the role is reduced to
+ground/compile/validate (draft twins only); no policy reaches the chain. `apply_patch`/
+`rebind_lane` stay **reserved** and the apply-path prohibitions stay **severed** regardless of
+grade.
 
 ## Audit trail
-`patch_apply` chain events (the applied policy + its `policy_fingerprint`); `governance_live` /
-`lane_capabilities` project the current enforced policy; the draft twins (compile/validate) are proposals,
-logged as such.
+The host's `apply_patch` chain events (the applied policy + its `policy_fingerprint`); the host's
+live-governance / lane-capabilities views project the current enforced policy; the draft twins
+(compile/validate) are proposals, logged as such.
 
 ## Promotion criteria
 L2 → L3: ≥4 clean ingest→compile→validate→(owner)apply cycles with every apply owner-confirmed and every

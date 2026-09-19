@@ -1,13 +1,13 @@
 # Lock steward
 
 **ID:** lock-steward
-**Skill:** loomground `knowledge-management` + RVND `workspace_lock` (Privacy Lock)
+**Skill:** loomground `knowledge-management` + an enforcement host's egress-lock interface (Privacy Lock)
 **Owner:** Felix (flxk1)
 **Autonomy grade:** L2 — status/classify/propose runs unattended; provision + strengthen held to L3, weaken/unseal to L4
 **Last reviewed:** 2026-09-04
 
 ## Purpose
-Provision and operate the **per-folder egress lock** (RVND Privacy Lock) through a conversation
+Provision and operate the **per-folder egress lock** (the Privacy Lock) through a conversation
 that saves settings — replacing the console install. Then **discharge** the minimisation gate
 (`egress_check`) on every egress. It manages the lock and is **never exempt** from it; on its own
 it can only make protection *stronger*.
@@ -29,11 +29,12 @@ act needs its `egress_check` discharge. No cron.
 ## Grade — unattended vs held
 - **Unattended (L2):** `lock_status`, `classify_content`, `propose_lock_profile`, `egress_check`,
   `ingress_check`.
-- **Held (L3, MCP-only signed):** `provision_lock` (`setup` + `seal`), `raise_threshold` — the
-  *strengthen* direction of the ratchet → `workspace_lock` mutating op + chain event.
-- **Held (L4, MCP-only signed):** `lower_threshold`, `downgrade_backend`, `unseal` — the *weaken*
+- **Held (L3, host-only signed):** `provision_lock` (`setup` + `seal`), `raise_threshold` — the
+  *strengthen* direction of the ratchet → a mutating call on the host's egress-lock interface +
+  chain event.
+- **Held (L4, host-only signed):** `lower_threshold`, `downgrade_backend`, `unseal` — the *weaken*
   direction; each carries `accepted_by` + `reason`.
-  On the bundled door every provision/threshold/seal/unseal is a **fail-closed HOLD**.
+  On any offline/bundled door every provision/threshold/seal/unseal is a **fail-closed HOLD**.
 
 ## Reserved / Prohibited (from the block)
 - **Reserved:** `provision_lock` + `unseal` to `workspace_owner`; `lower_threshold` +
@@ -47,7 +48,8 @@ act needs its `egress_check` discharge. No cron.
 1. **The ratchet (asymmetric change).** Strengthening (`provision_lock`, `raise_threshold`) is L3;
    weakening (`lower_threshold`, `downgrade_backend`, `unseal`) is L4 **and** reserved to distinct
    humans **and** requires `accepted_by` + `reason`. Autonomous acts can only tighten; loosening
-   always costs a human's signed reason. Mirrors RVND's own no-silent-downgrade guard.
+   always costs a human's signed reason — the general no-silent-downgrade shape any conforming
+   host applies to its own protections.
 2. **Fail-secure default-deny.** Absence of a lock is never read as permission: unknown / absent /
    unreachable status ⇒ the folder is UNPROTECTED ⇒ egress is HELD.
 Plus: `provision_is_not_access` (managing a folder's lock grants no egress right over its content)
@@ -83,17 +85,18 @@ the (server-authoritative) egress/ingress checks — it changes no setting and o
 The 3am answer is acceptable *because* provisioning and weakening are gated and reserved, and the
 default is deny — not because the role is trusted.
 
-## Kill switch (real RVND code)
-`revoke_agent_key(keyid)` in `rvnd/agent_keys.py` revokes the agent's Ed25519 key → its signed
-`provision_lock`/`raise_threshold` (L3) and `lower_threshold`/`downgrade_backend`/`unseal` (L4) acts
-stop (`get_agent_key` → `None`). And/or **floor the granted grade** → the role is reduced to
-status/classify/propose + the (read-only) egress checks; no setting changes. The weaken-direction
-acts stay **reserved** and the fail-secure prohibitions stay **severed** regardless of grade. On the
-read-only egress gateway all mutating ops are simply unavailable → fail closed.
+## Kill switch
+Revoking the role's signing key at the enforcement host stops its signed `provision_lock`/
+`raise_threshold` (L3) and `lower_threshold`/`downgrade_backend`/`unseal` (L4) acts. And/or
+**floor the granted grade** → the role is reduced to status/classify/propose + the (read-only)
+egress checks; no setting changes. The weaken-direction acts stay **reserved** and the
+fail-secure prohibitions stay **severed** regardless of grade. On a read-only egress-gateway
+deployment, all mutating ops are simply unavailable → fail closed.
 
 ## Audit trail
-`workspace_lock` mutating ops emit chain events (`every_change_chained`); the per-folder **lock
-profile** records who confirmed / when / reason (never the passphrase); `audit_query` is the read.
+The host's egress-lock interface emits chain events on every mutating op
+(`every_change_chained`); the per-folder **lock profile** records who confirmed / when / reason
+(never the passphrase); its read op returns the audit query.
 
 ## Promotion criteria
 L2 → L3: ≥4 clean provision/adjust cycles with a real backend (no mock), every weaken correctly

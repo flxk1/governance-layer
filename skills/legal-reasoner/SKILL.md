@@ -1,7 +1,7 @@
 ---
 name: legal-reasoner
 description: "Grounded premises to a warranted conclusion (apply, in-force, conflict, effect, deontic). Calls grounder first; enacts nothing alone. Use when grounded premises must be argued to a conclusion — 'what follows from these provisions', 'is this permitted / obligatory / forbidden', 'which norm wins', 'how likely is liability'."
-metadata: { provenance: { stamp: "tool=governance-layer version=0.1.0 input_sha256=bbaa0f380eaad70d6ff20292ef71c3b9c3bfe8c9009885a6ac1bb8ae20a404b2" } }
+metadata: { provenance: { stamp: "tool=governance-layer version=0.1.0 input_sha256=b2c6fe4f81ab7eca93d29cf183e7ac44203e848837874fda3033b8d6f997474d" } }
 governance:
   grade: L2
   actions:
@@ -34,7 +34,7 @@ governance:
 
 Grounded premises to a warranted conclusion (apply, in-force, conflict, effect, deontic). Calls grounder first; enacts nothing alone.
 
-**Doors.** MCP: workspace_legal, workspace_lens, workspace_policy, workspace_matrix. release_disposition to action_gate.gate (signed, reserved).
+**Doors.** Host: a legal-reasoning / lens / policy / coverage-matrix interface. release_disposition routes to the host's signed decision gate (reserved).
 
 ## Governance identity
-The `governance:` block above is the whole of this skill's authority. A skill is universal; the block turns it into a governed **role** that ctrl plans on and **RVND enforces** (signed `action_gate.gate` -> GO / CONDITIONAL / NO-GO on the Ed25519 chain), and the agent-registry records. Reserved acts hold for a human; prohibited kinds are severed regardless of grade.
+The `governance:` block above is the whole of this skill's authority. A skill is universal; the block turns it into a governed **role** that ctrl plans on and an **enforcement host enforces** (a signed verdict on the host's hash-chain -- auto / human / reserved / prohibited, joined strictest-wins), and the agent-registry records. Reserved acts hold for a human; prohibited kinds are severed regardless of grade.

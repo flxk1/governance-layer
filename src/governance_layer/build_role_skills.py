@@ -2,7 +2,8 @@
 
 Reproducible packaging: emits `../skills/<role>/SKILL.md` with the governance block in FRONTMATTER
 matching the skill-governance-block spec (schema/governance-block.schema.json), so the NORMAL
-installer (plugin install + RVND connect-agent-hub.sh) installs them and RVND enforces the block.
+installer (plugin install + an enforcement host's own connection step) installs them and the
+enforcement host enforces the block.
 Run: `python3 build_role_skills.py`  (idempotent). Then `validate_role_skills.py` checks the schema.
 """
 from __future__ import annotations
@@ -24,7 +25,7 @@ ROLES = [
   "on_boundary": "escalate-with-named-axis",
   "redress": [("disputed_grounding","reviewer",True,None)],
   "budget": {"usd":1,"iters":20},
-  "doors": "MCP: workspace_grounder, workspace_ask, cross_workspace_read (reads). Bundled: portable read + ground-or-escalate; signs nothing."},
+  "doors": "Host: a read-only grounding-evidence interface (provenance, ask, cross-workspace read). Bundled: portable read + ground-or-escalate; signs nothing."},
 
  {"name": "legal-reasoner", "plane": "Loomground · reason",
   "purpose": "Grounded premises to a warranted conclusion (apply, in-force, conflict, effect, deontic). Calls grounder first; enacts nothing alone.",
@@ -37,7 +38,7 @@ ROLES = [
   "on_boundary": "escalate-and-state-gap",
   "redress": [("released_disposition","affected_party",True,"14d")],
   "budget": {"usd":5,"iters":40},
-  "doors": "MCP: workspace_legal, workspace_lens, workspace_policy, workspace_matrix. release_disposition to action_gate.gate (signed, reserved)."},
+  "doors": "Host: a legal-reasoning / lens / policy / coverage-matrix interface. release_disposition routes to the host's signed decision gate (reserved)."},
 
  {"name": "knowledge-steward", "plane": "Loomground · curate",
   "purpose": "Build and maintain the graph: ingest, concepts, placement, write, curate; enrich; erase. The one write/erase authority.",
@@ -50,9 +51,9 @@ ROLES = [
   "on_boundary": "quarantine-or-review-queue",
   "redress": [("graph_erase","subject",False,"30d"),("graph_write","workspace_owner",True,None)],
   "budget": {"usd":5,"iters":40},
-  "doors": "MCP: workspace_ingest, workspace_capture, workspace_memory, workspace_folder, workspace_mirror, workspace_erase. Writes to MutationLog.append + signing (signed, reserved)."},
+  "doors": "Host: ingest / capture / memory / folder / mirror / erase interfaces. Writes append to the host's signed mutation chain (reserved)."},
 
- {"name": "lock-steward", "plane": "RVND · secure",
+ {"name": "lock-steward", "plane": "secure (host-enforced)",
   "purpose": "Provisions and discharges the per-folder egress lock (Privacy Lock). Manages the lock, never exempt. Ratchet + fail-secure.",
   "use_when": "Use when a folder's egress lock must be provisioned, checked, raised, lowered, or unsealed — 'lock this folder', 'lock status', 'egress-check this payload', 'unseal'.",
   "grade": "L2",
@@ -63,9 +64,9 @@ ROLES = [
   "on_boundary": "hold-and-explain",
   "redress": [("lower_threshold","workspace_owner",True,None),("provision_lock","workspace_owner",True,"30d")],
   "budget": {"usd":2,"iters":25},
-  "doors": "MCP: workspace_lock (setup/threshold/seal/classify/egress_check/ingress_check/audit_query). Mutations signed + reserved; bundled door HOLDs."},
+  "doors": "Host: an egress-lock interface (setup/threshold/seal/classify/egress_check/ingress_check/audit_query). Mutations signed + reserved; bundled door HOLDs."},
 
- {"name": "policy-officer", "plane": "Loomground to RVND · govern",
+ {"name": "policy-officer", "plane": "Loomground to enforcement host · govern",
   "purpose": "versum-policy to validated .lg to a human applying it. Makes known policy enforced. Know real-time; enforce-a-change reserved.",
   "use_when": "Use when a known policy must become enforced — 'compile this policy to .lg', 'validate this patch', 'apply this patch', 'rebind the lane'.",
   "grade": "L2",
@@ -76,9 +77,9 @@ ROLES = [
   "on_boundary": "hand-off-or-escalate",
   "redress": [("apply_patch","workspace_owner",True,"14d")],
   "budget": {"usd":3,"iters":30},
-  "doors": "MCP: workspace_workflow (policy_ingest/governance_chat/patch_validate/patch_apply/governance_open/lane_capabilities), workspace_policy. apply_patch signed + reserved."},
+  "doors": "Host: a policy-workflow interface (ingest/chat/validate/apply/open/lane-capabilities) plus a policy-declaration interface. apply_patch signed + reserved."},
 
- {"name": "auditor", "plane": "RVND · audit",
+ {"name": "auditor", "plane": "audit (host-enforced)",
   "purpose": "Read-only over the signed chain (verify_chain/tail/shadow_scan/discipline). Writes nothing but an attributed override. Reports, never repairs.",
   "use_when": "Use when the signed chain must be verified or reported on — 'verify the chain', 'tail the chain', 'shadow scan', 'discipline check', 'record an override'.",
   "grade": "L2",
@@ -89,7 +90,7 @@ ROLES = [
   "on_boundary": "report-not-repair",
   "redress": [("recorded_override","workspace_owner",True,None)],
   "budget": {"usd":1,"iters":30},
-  "doors": "MCP: workspace_audit (verify_chain/tail/get_event/shadow_scan/discipline/overrides/record_override). record_override is the only append."},
+  "doors": "Host: a read-only audit interface (verify/tail/get-event/shadow-scan/discipline/overrides/record-override). record_override is the only append."},
 
  {"name": "local-grounder", "plane": "Loomground · ground (private) — LOCAL-ONLY",
   "purpose": "Grounds Felix's own work over his private knowledge folder. Firewalled from the product: never ships, never a product dependency, output never reaches the official versum.",
@@ -167,10 +168,11 @@ def build(root: Path | None = None):
                 f"**Doors.** {role['doors']}\n\n"
                 "## Governance identity\n"
                 "The `governance:` block above is the whole of this skill's authority. A skill is universal; "
-                "the block turns it into a governed **role** that ctrl plans on and **RVND enforces** "
-                "(signed `action_gate.gate` -> GO / CONDITIONAL / NO-GO on the Ed25519 chain), and the "
-                "agent-registry records. Reserved acts hold for a human; prohibited kinds are severed "
-                "regardless of grade.\n")
+                "the block turns it into a governed **role** that ctrl plans on and an **enforcement "
+                "host enforces** "
+                "(a signed verdict on the host's hash-chain -- auto / human / reserved / prohibited, "
+                "joined strictest-wins), and the agent-registry records. Reserved acts hold for a human; "
+                "prohibited kinds are severed regardless of grade.\n")
         (d / "SKILL.md").write_text(fm + body, encoding="utf-8")
         rel = (d / "SKILL.md").relative_to(out.parent)
         written.append(str(rel))

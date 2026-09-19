@@ -1,7 +1,7 @@
 ---
 name: knowledge-steward
 description: "Build and maintain the graph: ingest, concepts, placement, write, curate; enrich; erase. The one write/erase authority. Use when material must enter, be curated in, or be erased from the graph — 'ingest this', 'add what we learned to the graph', 'curate the concepts', 'erase this subject'."
-metadata: { provenance: { stamp: "tool=governance-layer version=0.1.0 input_sha256=200df2818a0a6de97d864ee96617fba3084323d2b60a3a947f028cd7eed2eccf" } }
+metadata: { provenance: { stamp: "tool=governance-layer version=0.1.0 input_sha256=4d337b7bb3cd4ca89127cfa401fec9873132209bd9a01a81ee83a1370a218b83" } }
 governance:
   grade: L2
   actions:
@@ -39,7 +39,7 @@ governance:
 
 Build and maintain the graph: ingest, concepts, placement, write, curate; enrich; erase. The one write/erase authority.
 
-**Doors.** MCP: workspace_ingest, workspace_capture, workspace_memory, workspace_folder, workspace_mirror, workspace_erase. Writes to MutationLog.append + signing (signed, reserved).
+**Doors.** Host: ingest / capture / memory / folder / mirror / erase interfaces. Writes append to the host's signed mutation chain (reserved).
 
 ## Governance identity
-The `governance:` block above is the whole of this skill's authority. A skill is universal; the block turns it into a governed **role** that ctrl plans on and **RVND enforces** (signed `action_gate.gate` -> GO / CONDITIONAL / NO-GO on the Ed25519 chain), and the agent-registry records. Reserved acts hold for a human; prohibited kinds are severed regardless of grade.
+The `governance:` block above is the whole of this skill's authority. A skill is universal; the block turns it into a governed **role** that ctrl plans on and an **enforcement host enforces** (a signed verdict on the host's hash-chain -- auto / human / reserved / prohibited, joined strictest-wins), and the agent-registry records. Reserved acts hold for a human; prohibited kinds are severed regardless of grade.

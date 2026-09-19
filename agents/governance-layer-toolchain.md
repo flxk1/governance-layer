@@ -1,7 +1,7 @@
 # Governance-layer toolchain
 
 **ID:** governance-layer-toolchain
-**Skill:** governance-layer `packaging/` (compile / build / validate)
+**Skill:** governance-layer's toolchain (`src/governance_layer/`: compile / build / validate)
 **Owner:** Felix (flxk1)
 **Autonomy grade:** L0 — no unattended action; `build`/`compile` emit a human-reviewed diff and are never auto-run; `validate` is read-only and the only entry point safe unattended
 **Last reviewed:** 2026-09-06
@@ -10,8 +10,8 @@
 The skill-governance-block toolchain: it **builds** the governed role SKILL.md packages
 (`build_role_skills`), **compiles** each role's governance block to a Loomground `.lg` patch
 (`compile_block_to_lg`), and **validates** those blocks against the skill-governance-block schema
-(`validate_role_skills`). It mints the `.lg` declarations RVND and the agent-registry treat as
-**ground truth** — so the tool that produces them must itself be governed.
+(`validate_role_skills`). It mints the `.lg` declarations the enforcement host and the
+agent-registry treat as **ground truth** — so the tool that produces them must itself be governed.
 
 ## Scope
 **In scope (why):** emit/refresh role SKILL.md packages; compile governance blocks → `.lg`;
@@ -53,7 +53,7 @@ output — those are a reviewed diff a human lands.
 ## Failure modes
 1. *Silent drift* — `build`/`compile` auto-run in CI, output committed unreviewed; a governance
    block change ships without human sight. Notices: L0 gate (build/compile never unattended) + the
-   reviewed-diff requirement. Blast radius: a wrong `.lg` becomes RVND ground truth.
+   reviewed-diff requirement. Blast radius: a wrong `.lg` becomes the enforcement host's ground truth.
 2. *Unprovenanced artefact* — a `.lg` with no tool/version/input-hash stamp; "which tool version,
    from what block, produced this?" is unanswerable. Notices: the stamping obligation + a CI check
    that every emitted artefact carries a stamp.

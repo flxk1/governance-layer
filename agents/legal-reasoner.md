@@ -24,14 +24,14 @@ Called on demand with a legal question. No cron.
 
 ## Grade — unattended vs held
 - **Unattended (L2):** `warrant_conclusion`, `quantify_exposure`. Analysis, no side effect.
-- **Held (L3):** `emit_lg_patch` — emitted as **provisional (unsigned)** on the bundled door.
-- **Held (L4, MCP-only signed gate):** `release_disposition` → `action_gate.gate(ActionRequest…)`
-  yielding GO/CONDITIONAL/NO-GO, and on GO an audit-triple receipt to the chain. The bundled
-  path **HOLDs** — it cannot sign or gate.
+- **Held (L3):** `emit_lg_patch` — emitted as **provisional (unsigned)** on any offline/bundled door.
+- **Held (L4, host-only signed gate):** `release_disposition` → the host's signed decision gate,
+  yielding a Loomground verdict (`auto / human / reserved / prohibited`), and on `auto` an
+  audit-triple receipt to the chain. Any offline/bundled path **HOLDs** — it cannot sign or gate.
 
 ## Reserved / Prohibited (from the block)
 - **Reserved:** `release_disposition` to a **quorum of 2** distinct parties
-  {legal_reviewer, policy_owner} (separation of duty) — NO-GO/CONDITIONAL until distinct-party
+  {legal_reviewer, policy_owner} (separation of duty) — held/reserved until distinct-party
   sign-off.
 - **Prohibited:** `reason_over_unconfirmed`, `self_enact`, `parallel_grounding_layer`.
 - **On boundary:** escalate-and-state-gap — scope_applies contested / no dominant provision /
@@ -48,7 +48,7 @@ Called on demand with a legal question. No cron.
    `premises_confirmed` + `grounding_called_first`.
 3. *Self-enactment* — treats its own conclusion as a released disposition. Symptom: a
    disposition with no quorum sign-off record. Blast radius: an ungoverned legal effect.
-   Notices: the reserved quorum gate (NO-GO) + the chain.
+   Notices: the reserved quorum gate (held) + the chain.
 
 ## 3am worst-case
 Running amok, the block bounds the blast radius by construction: `self_enact` and
@@ -57,19 +57,20 @@ unconfirmed ground); `release_disposition` is both **L4** (a granted-L2 actor is
 `human`) and **reserved** to a distinct-party quorum (withheld until two named humans sign);
 `emit_lg_patch` is **L3** and, on any bundled path, unsigned/provisional. The worst it can do
 unattended is emit **provisional, unsigned** conclusions and `.lg` patch drafts — nothing is
-gated, signed, or released. Every disposition still requires the signed `action_gate.gate` plus
+gated, signed, or released. Every disposition still requires the host's signed decision gate plus
 two distinct sign-offs. The 3am answer is acceptable *because* release is reserved and gated, not
 because the role is trusted.
 
-## Kill switch (real RVND code)
-`revoke_agent_key(keyid)` in `rvnd/agent_keys.py` revokes the agent's Ed25519 key → its signed
-`emit_lg_patch` / `release_disposition` acts stop (`get_agent_key` → `None`). And/or **floor the
-granted grade** → analysis floors to `human`; the L4/L3 acts cannot run. `release_disposition`
-stays **reserved** (withheld to the quorum) and `self_enact` stays **prohibited** (severed)
-regardless of grade. **Tested:** ✅ exercised 2026-09-03 — `revoke_agent_key` on RVND's live key registry killed the agent (`get_agent_key` → None, signed acts fail-closed).
+## Kill switch
+Revoking the role's signing key at the enforcement host stops its signed `emit_lg_patch` /
+`release_disposition` acts. And/or **floor the granted grade** → analysis floors to `human`; the
+L4/L3 acts cannot run. `release_disposition` stays **reserved** (withheld to the quorum) and
+`self_enact` stays **prohibited** (severed) regardless of grade. A conforming host proves this
+with a load-bearing test (skill-governance-block SPEC §7).
 
 ## Audit trail
-`action_gate.gate` per-action verdict + the chain receipt on GO; the run's log for analysis.
+The host's signed decision-gate verdict per action + the chain receipt on `auto`; the run's log
+for analysis.
 
 ## Promotion criteria
 L2 → L3: ≥4 clean reasoning cycles with warrants intact and <20% escalation-error, a tested

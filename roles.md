@@ -1,23 +1,26 @@
-# roles.md — the skill→role transition (RVND governance layer)
+# roles.md — the skill→role transition (governance layer)
 
-ctrl orchestrates · **RVND governs (this layer)** · Loomground grounds.
+ctrl orchestrates · **an enforcement host governs (this layer)** · Loomground grounds.
 A loomground skill is *universal* and carries **no governance identity**. A **ROLE** = that
-skill + a **governance-block** (skill-governance-block v0.1 schema). RVND **enforces** the block
-(the signed gate + hash-chain + receipts); the **agent-registry records** it. One declaration →
-reader plans on it, enforcer verdicts on it. "Loomground is universal; via RVND/ctrl:legal these
-skills become governance capabilities."
+skill + a **governance-block** (skill-governance-block v0.1 schema). An enforcement host
+**enforces** the block (a signed decision gate + hash-chain + receipts); the
+**agent-registry records** it. One declaration → reader plans on it, enforcer verdicts on it.
+"Loomground is universal; via an enforcement host and ctrl:legal these skills become governance
+capabilities."
 
 ## Dual transport (per role, every function)
-- **Bundled skill door** — portable, fail-closed, **CANNOT sign**. Any signed/stateful/authoritative
-  act on this path is a **fail-closed HOLD**, never a computed result.
-- **MCP door** — RVND `mcp__plugin_rvnd_rvnd__workspace_*`, authoritative, **signed**.
-- **MCP-ONLY acts** (a bundled path here returns HOLD, not a value): gate a released disposition ·
-  append to the chain · mint/verify a receipt · erase. Grounded in real RVND functions
-  (`rvnd.action_gate.gate`, `rvnd.mutation_log.MutationLog.append` + `rvnd.signing`,
-  `gateway._audit_receipt`, `rvnd.erasure` signed tombstone).
+- **Offline/bundled skill door** — portable, fail-closed, **CANNOT sign**. Any
+  signed/stateful/authoritative act on this path is a **fail-closed HOLD**, never a computed
+  result.
+- **Host-connected door** — the enforcement host's own interface, authoritative, **signed**.
+- **Host-only acts** (an offline path here returns HOLD, not a value): gate a released
+  disposition · append to the chain · mint/verify a receipt · erase — each requires the host's
+  signed decision gate, its hash-chained mutation log, its signed receipts, and its signed
+  tombstone erasure, respectively.
 
-Verdict vocabulary (RVND `action_gate.Verdict`): **GO / CONDITIONAL / NO-GO**; strictest-wins over
-the Loomground join `prohibited > reserved > refused > human > auto`. Grade ladder L0<…<L6.
+Verdict vocabulary (skill-governance-block SPEC §3, the Loomground join): **auto / human /
+reserved / prohibited**, joined strictest-wins (`prohibited > reserved > refused > human > auto`).
+Grade ladder L0<…<L6.
 
 ---
 
@@ -56,10 +59,10 @@ governance:
     - { kind: disputed_grounding, by: reviewer, overturn: true }
   budget: { usd: 1, iters: 20 }
 ```
-- **MCP door:** `rvnd:workspace_grounder`, `rvnd:workspace_ask`, `rvnd:cross_workspace_read` (reads only).
-- **MCP-ONLY (signed):** `emit_provenance_receipt` → `gateway._audit_receipt` + chain; the bundled
-  door returns the evidence but **HOLDs** the signed receipt.
-- **Bundled door:** portable read + ground-or-escalate; fully usable offline, signs nothing.
+- **Host door:** a read-only grounding-evidence interface (provenance, ask, cross-workspace read).
+- **Host-only (signed):** `emit_provenance_receipt` → the host's signed receipt + chain; any
+  offline door returns the evidence but **HOLDs** the signed receipt.
+- **Offline door:** portable read + ground-or-escalate; fully usable offline, signs nothing.
 
 ---
 
@@ -98,12 +101,12 @@ governance:
     - { kind: released_disposition, by: affected_party, overturn: true, within: 14d }
   budget: { usd: 5, iters: 40 }
 ```
-- **MCP door:** `rvnd:workspace_legal`, `rvnd:workspace_lens`, `rvnd:workspace_policy` (patch), `rvnd:workspace_matrix`.
-- **MCP-ONLY (signed):** `release_disposition` → **`action_gate.gate(ActionRequest…)`** yielding
-  GO/CONDITIONAL/NO-GO, and on GO an audit-triple receipt to the chain. A reserved
-  quorum action is NO-GO/CONDITIONAL until distinct-party sign-off.
-- **Bundled door:** emits the warranted conclusion / `.lg` patch as **provisional (unsigned)**;
-  releasing a disposition is a **HOLD** — the bundled path cannot sign or gate.
+- **Host door:** a legal-reasoning / lens / policy (patch) / coverage-matrix interface.
+- **Host-only (signed):** `release_disposition` → **the host's signed decision gate**, yielding
+  a Loomground verdict (`auto/human/reserved/prohibited`), and on `auto` an audit-triple receipt
+  to the chain. A reserved quorum action is held/`reserved` until distinct-party sign-off.
+- **Offline door:** emits the warranted conclusion / `.lg` patch as **provisional (unsigned)**;
+  releasing a disposition is a **HOLD** — the offline path cannot sign or gate.
 
 ---
 
@@ -147,20 +150,19 @@ governance:
     - { kind: graph_write,  by: workspace_owner, overturn: true }
   budget: { usd: 5, iters: 40 }
 ```
-- **MCP door:** `rvnd:workspace_ingest`, `rvnd:workspace_capture`, `rvnd:workspace_memory`, `rvnd:workspace_folder`,
-  `rvnd:workspace_mirror`, `rvnd:workspace_erase`.
-- **MCP-ONLY (signed):**
-  - `graph_write` / `curate_canon` → **`MutationLog.append(LogEvent)`** (SHA-256 `prev_hash` chain)
-    + **`signing.sign_bytes`** (Ed25519 over canonical-content|prev_hash) → verifiable receipt.
-  - `graph_erase` → **`rvnd:workspace_erase`** = `rvnd.erasure` sweep → **one signed composite tombstone**
-    (`composite_tombstone_id`), reserved to a distinct-party human pair.
-- **Bundled door:** ingest **dry-run**, concept extraction, placement **proposals** only. Every
+- **Host door:** ingest / capture / memory / folder / mirror / erase interfaces.
+- **Host-only (signed):**
+  - `graph_write` / `curate_canon` → the host's **hash-chained mutation log** (SHA-256 `prev_hash`
+    chain) + an **Ed25519 signature** (over canonical-content|prev_hash) → verifiable receipt.
+  - `graph_erase` → the host's **erasure sweep** → **one signed composite tombstone**, reserved to
+    a distinct-party human pair.
+- **Offline door:** ingest **dry-run**, concept extraction, placement **proposals** only. Every
   `graph_write` / `curate_canon` / `graph_erase` is a **fail-closed HOLD** — the portable skill
   cannot append to the chain, sign, or mint a tombstone.
 
 ---
 
-## ROLE 4 — `lock-steward`  (skill: RVND `secure` / Privacy Lock)
+## ROLE 4 — `lock-steward`  (skill: secure / Privacy Lock, host-enforced)
 Provisions and discharges the per-folder egress lock. Manages the lock, never exempt from it.
 Ratchet + fail-secure: secure default backend, no silent weakening, every change chained.
 
@@ -202,14 +204,14 @@ governance:
     - { kind: provision_lock,  by: workspace_owner, overturn: true, within: 30d }
   budget: { usd: 2, iters: 25 }
 ```
-- **MCP door:** `rvnd:workspace_lock` (setup/threshold_set/seal/classify/egress_check/ingress_check/audit_query).
-- **MCP-ONLY (signed + reserved):** provision/threshold/backend/unseal mutations → signed chain event;
-  the bundled door **HOLDs** every mutation. Weakenings are distinct-party reserved.
-- **Bundled door:** status + classify + egress/ingress *checks* only; signs nothing, mutates nothing.
+- **Host door:** an egress-lock interface (setup/threshold_set/seal/classify/egress_check/ingress_check/audit_query).
+- **Host-only (signed + reserved):** provision/threshold/backend/unseal mutations → signed chain event;
+  any offline door **HOLDs** every mutation. Weakenings are distinct-party reserved.
+- **Offline door:** status + classify + egress/ingress *checks* only; signs nothing, mutates nothing.
 
 ---
 
-## ROLE 5 — `policy-officer`  (skill: Loomground→RVND `govern`)
+## ROLE 5 — `policy-officer`  (skill: Loomground→enforcement host `govern`)
 versum-policy → validated `.lg` twin → a **human** applies it. Makes known policy enforced.
 Knowing/compiling policy is unattended; enforcing a change is reserved.
 
@@ -240,14 +242,14 @@ governance:
     - { kind: apply_patch, by: workspace_owner, overturn: true, within: 14d }
   budget: { usd: 3, iters: 30 }
 ```
-- **MCP door:** `rvnd:workspace_workflow` (policy_ingest/governance_chat/patch_validate/patch_apply/
-  governance_open/lane_capabilities), `rvnd:workspace_policy`.
-- **MCP-ONLY (signed + reserved):** `apply_patch` → the signed enforce, reserved to the workspace owner.
-- **Bundled door:** ground + compile the `.lg` twin + validate — all **provisional**; applying is a HOLD.
+- **Host door:** a policy-workflow interface (ingest/chat/validate/apply/open/lane-capabilities)
+  plus a policy-declaration interface.
+- **Host-only (signed + reserved):** `apply_patch` → the signed enforce, reserved to the workspace owner.
+- **Offline door:** ground + compile the `.lg` twin + validate — all **provisional**; applying is a HOLD.
 
 ---
 
-## ROLE 6 — `auditor`  (skill: RVND `audit`)
+## ROLE 6 — `auditor`  (skill: audit, host-enforced)
 Read-only over the signed chain. Writes nothing but an **attributed override**. Reports, never repairs.
 
 ```
@@ -276,9 +278,9 @@ governance:
     - { kind: recorded_override, by: workspace_owner, overturn: true }
   budget: { usd: 1, iters: 30 }
 ```
-- **MCP door:** `rvnd:workspace_audit` (verify_chain/tail/get_event/shadow_scan/discipline/overrides/record_override).
+- **Host door:** a read-only audit interface (verify_chain/tail/get_event/shadow_scan/discipline/overrides/record_override).
 - **The only append** is `record_override` — an attributed, rationale-bearing note; nothing else mutates.
-- **Bundled door:** verify + tail + scan; a portable read of the chain. Repairs nothing.
+- **Offline door:** verify + tail + scan; a portable read of the chain. Repairs nothing.
 
 ---
 
@@ -309,11 +311,12 @@ governance:
     - { kind: private_grounding, by: felix, overturn: true }
   budget: { usd: 1, iters: 20 }
 ```
-- **No MCP / no signing / no product seam.** A local reader over the private folder
+- **No host connection, no signing, no product seam.** A local reader over the private folder
   (Obsidian / local versum / local RAG). It has no authoritative door by design.
 - **The firewall is two-sided:** `grounder` (ROLE 1) is `official_versum_only` + prohibits
   `ground_from_private_folder`; `local-grounder` prohibits `feed_product_grounding` /
-  `write_to_official_versum` / `egress_private_content` / `ship`. Verified NO-GO @L4 both sides.
+  `write_to_official_versum` / `egress_private_content` / `ship`. Both prohibitions are severed
+  regardless of grade — a conforming host's load-bearing test (SPEC §7) proves both sides hold.
 
 ---
 
@@ -321,10 +324,11 @@ governance:
 - **Reader (ctrl, plan-time):** `need = max(grade, actions[].grade)`; gap above granted grade →
   surface, don't dispatch. Route every `reserved` to its human target (hold). Exclude `prohibited`
   (withhold the capability, not merely refuse). Carry `obligations` as accept-criteria. Cap at `budget`.
-- **Enforcer (RVND, action-time):** `action_gate.gate` returns GO/CONDITIONAL/NO-GO per action from
-  the same block; `unavailable`/unknown floors to the weaker-safer path (never a false GO). Registry
-  records grade/prohibited/reserved/budget → the 3am worst-case is a *reading* of these lines.
-- **Load-bearing invariants (per SGB §7):** a below-grade action → CONDITIONAL/human; a reserved
-  action → reserved (NO-GO until sign-off); a prohibited kind → NO-GO (severed); an unattached
+- **Enforcer (the enforcement host, action-time):** the host's signed decision gate returns a
+  Loomground verdict (`auto/human/reserved/prohibited`) per action from the same block;
+  `unavailable`/unknown floors to the weaker-safer path (never a false `auto`). Registry records
+  grade/prohibited/reserved/budget → the 3am worst-case is a *reading* of these lines.
+- **Load-bearing invariants (per SGB §7):** a below-grade action → `human`; a reserved
+  action → `reserved` (held until sign-off); a prohibited kind → `prohibited` (severed); an unattached
   obligation withholds release.
 ```

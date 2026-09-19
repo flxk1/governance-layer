@@ -1,7 +1,7 @@
 # Auditor
 
 **ID:** auditor
-**Skill:** RVND `workspace_audit` (read-only over the signed chain)
+**Skill:** the enforcement host's read-only audit interface (over the signed chain)
 **Owner:** Felix (flxk1)
 **Autonomy grade:** L2 — reads/verifies run unattended; it mutates nothing enforceable
 **Last reviewed:** 2026-09-04
@@ -25,8 +25,8 @@ verify can be scheduled, but the auditor performs no remediation.
 
 ## Grade — unattended vs held
 - **Unattended (L2):** all reads — `verify_chain`, `tail_chain`, `get_event`, `shadow_scan`, `discipline`.
-- **Held (MCP-only signed):** `record_override` — one attributed override event to the chain; a fail-closed
-  HOLD on the bundled door.
+- **Held (host-only, signed):** `record_override` — one attributed override event to the chain; a
+  fail-closed HOLD on any offline/bundled path.
 
 ## Reserved / Prohibited (from the block)
 - **Reserved:** none — pure read + attributed override-logging; nothing enacted.
@@ -53,14 +53,15 @@ fail-closed HOLD on any bundled path. The worst it can do unattended is **read**
 integrity, and **surface** shadow/discipline findings — assurance, not action. The 3am answer is acceptable
 *because* the role is structurally write-nothing (an auditor that could fix things is not an auditor).
 
-## Kill switch (real RVND code)
-`revoke_agent_key(keyid)` in `rvnd/agent_keys.py` → its signed `record_override` append stops
-(`get_agent_key` → `None`). Reads are already non-mutating; flooring the grade changes nothing enforceable.
-The write-nothing prohibitions stay **severed** regardless of grade.
+## Kill switch
+Revoking the role's signing key at the enforcement host stops its signed `record_override` append.
+Reads are already non-mutating; flooring the grade changes nothing enforceable. The write-nothing
+prohibitions stay **severed** regardless of grade. (A conforming host proves this per
+skill-governance-block SPEC §7's load-bearing test.)
 
 ## Audit trail
 The audit *is* the trail: `verify_chain` results, `tail`/`get_event` reads, `shadow_scan`/`discipline`
-rollups, and each attributed `record_override`. Pairs with the Privacy-Lock `audit_log_path` (RV2) to
+rollups, and each attributed `record_override`. Pairs with the egress-lock's own audit log to
 complete the per-folder audit story.
 
 ## Promotion criteria

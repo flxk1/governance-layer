@@ -21,8 +21,8 @@ Called on demand — by a human or by `legal-reasoner` needing confirmed premise
 
 ## Grade — unattended vs held
 - **Unattended (L2):** `ground_query`, `read_evidence`. Read-only, recoverable, no side effect.
-- **Held (L3, MCP-only signed):** `emit_provenance_receipt` → `gateway._audit_receipt` + chain.
-  The bundled door returns the evidence but **HOLDs** the signed receipt.
+- **Held (L3, host-only signed):** `emit_provenance_receipt` → the host's signed receipt + chain.
+  Any offline/bundled door returns the evidence but **HOLDs** the signed receipt.
 
 ## Reserved / Prohibited (from the block)
 - **Reserved:** none — pure read, nothing referred.
@@ -54,16 +54,14 @@ gated by `provenance_attached` (no source → withheld). Nothing is written, sig
 The 3am answer is acceptable *because* the boundary is declared read-only, not because the role
 is trusted.
 
-## Kill switch (real RVND code)
-`revoke_agent_key(keyid)` in `rvnd/agent_keys.py` marks the agent's Ed25519 key revoked
-(kept for audit) → `get_agent_key` resolves it to `None` → the agent's signed
-`emit_provenance_receipt` acts stop. And/or **floor the granted grade** → every serve floors to
-`human` at the enforcer. The `prohibited` kinds are severed regardless of grade. **Tested:** ✅ exercised 2026-09-03 —
-`revoke_agent_key` on RVND's live key registry killed the agent (`get_agent_key` → None, signed acts
-fail-closed); run in worktree `_local/worktrees/RVND/projects-ab`, `rvnd-repos` unmodified.
+## Kill switch
+Revoking the role's signing key at the enforcement host marks it revoked (kept for audit) → the
+agent's signed `emit_provenance_receipt` acts stop. And/or **floor the granted grade** → every
+serve floors to `human` at the enforcer. The `prohibited` kinds are severed regardless of grade.
+A conforming host proves this with a load-bearing test (skill-governance-block SPEC §7).
 
 ## Audit trail
-`gateway._audit_receipt` + the hash-chain (for the signed receipt); the run's own log for reads.
+The host's signed receipt on the hash-chain (for `emit_provenance_receipt`); the run's own log for reads.
 
 ## Promotion criteria
 L2 → L3: ≥4 clean serve cycles with <20% escalation-error, a tested notification path, an

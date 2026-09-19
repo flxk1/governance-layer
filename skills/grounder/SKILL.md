@@ -1,7 +1,7 @@
 ---
 name: grounder
 description: "Read-only evidence at coordinate + provenance, or ground-or-escalate. Serves; never writes. Product grounder — official versum only. Use when a claim must be grounded against the official versum — 'ground this', 'is this in the corpus', 'give me the source for X at date D', 'confirm this against the graph'."
-metadata: { provenance: { stamp: "tool=governance-layer version=0.1.0 input_sha256=678f14e16540866184f1de7f4a8070e048ca5ee57e1c44b1799d28f3a85dc8b0" } }
+metadata: { provenance: { stamp: "tool=governance-layer version=0.1.0 input_sha256=f0643419d59d79f7fcebd32e47f25b4648a1b6ecad120a15c0d45102f466ca7c" } }
 governance:
   grade: L2
   actions:
@@ -35,7 +35,7 @@ governance:
 
 Read-only evidence at coordinate + provenance, or ground-or-escalate. Serves; never writes. Product grounder — official versum only.
 
-**Doors.** MCP: workspace_grounder, workspace_ask, cross_workspace_read (reads). Bundled: portable read + ground-or-escalate; signs nothing.
+**Doors.** Host: a read-only grounding-evidence interface (provenance, ask, cross-workspace read). Bundled: portable read + ground-or-escalate; signs nothing.
 
 ## Governance identity
-The `governance:` block above is the whole of this skill's authority. A skill is universal; the block turns it into a governed **role** that ctrl plans on and **RVND enforces** (signed `action_gate.gate` -> GO / CONDITIONAL / NO-GO on the Ed25519 chain), and the agent-registry records. Reserved acts hold for a human; prohibited kinds are severed regardless of grade.
+The `governance:` block above is the whole of this skill's authority. A skill is universal; the block turns it into a governed **role** that ctrl plans on and an **enforcement host enforces** (a signed verdict on the host's hash-chain -- auto / human / reserved / prohibited, joined strictest-wins), and the agent-registry records. Reserved acts hold for a human; prohibited kinds are severed regardless of grade.

@@ -1,7 +1,7 @@
 ---
 name: policy-officer
 description: "versum-policy to validated .lg to a human applying it. Makes known policy enforced. Know real-time; enforce-a-change reserved. Use when a known policy must become enforced — 'compile this policy to .lg', 'validate this patch', 'apply this patch', 'rebind the lane'."
-metadata: { provenance: { stamp: "tool=governance-layer version=0.1.0 input_sha256=17271c186354d362a342e7614286b6e1d7785b6c6a7cfa96c077bd9cd0c9ccff" } }
+metadata: { provenance: { stamp: "tool=governance-layer version=0.1.0 input_sha256=8cfd874f1ef29340ba4484156df3c071c3a5c742ca2def0a6cb161655e1883b8" } }
 governance:
   grade: L2
   actions:
@@ -31,11 +31,11 @@ governance:
 
 # policy-officer
 
-**Plane:** Loomground to RVND · govern
+**Plane:** Loomground to enforcement host · govern
 
 versum-policy to validated .lg to a human applying it. Makes known policy enforced. Know real-time; enforce-a-change reserved.
 
-**Doors.** MCP: workspace_workflow (policy_ingest/governance_chat/patch_validate/patch_apply/governance_open/lane_capabilities), workspace_policy. apply_patch signed + reserved.
+**Doors.** Host: a policy-workflow interface (ingest/chat/validate/apply/open/lane-capabilities) plus a policy-declaration interface. apply_patch signed + reserved.
 
 ## Governance identity
-The `governance:` block above is the whole of this skill's authority. A skill is universal; the block turns it into a governed **role** that ctrl plans on and **RVND enforces** (signed `action_gate.gate` -> GO / CONDITIONAL / NO-GO on the Ed25519 chain), and the agent-registry records. Reserved acts hold for a human; prohibited kinds are severed regardless of grade.
+The `governance:` block above is the whole of this skill's authority. A skill is universal; the block turns it into a governed **role** that ctrl plans on and an **enforcement host enforces** (a signed verdict on the host's hash-chain -- auto / human / reserved / prohibited, joined strictest-wins), and the agent-registry records. Reserved acts hold for a human; prohibited kinds are severed regardless of grade.

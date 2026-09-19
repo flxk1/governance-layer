@@ -23,11 +23,11 @@ Called on demand — ingest an artifact, curate the canon, run an erasure. No cr
 
 ## Grade — unattended vs held
 - **Unattended (L2):** `ingest_dryrun`, `extract_concepts`, `propose_placement`.
-- **Held (L3, MCP-only signed):** `graph_write`, `curate_canon` (the canon run IS a write) →
-  `MutationLog.append(LogEvent)` (SHA-256 `prev_hash` chain) + `signing.sign_bytes` (Ed25519).
-- **Held (L4, MCP-only signed):** `graph_erase` → `rvnd:workspace_erase` = `rvnd.erasure` sweep →
-  one signed composite tombstone (`composite_tombstone_id`).
-  On the bundled door every write/curate/erase is a **fail-closed HOLD**.
+- **Held (L3, host-only signed):** `graph_write`, `curate_canon` (the canon run IS a write) →
+  the host's hash-chained mutation log (SHA-256 `prev_hash` chain) + an Ed25519 signature.
+- **Held (L4, host-only signed):** `graph_erase` → the host's erasure sweep → one signed
+  composite tombstone.
+  On any offline/bundled door every write/curate/erase is a **fail-closed HOLD**.
 
 ## Reserved / Prohibited (from the block)
 - **Reserved:** `graph_erase` to **distinct parties** {data_protection_officer, workspace_owner};
@@ -59,20 +59,20 @@ no ungoverned write, no invented node, no unlogged change); `graph_write`/`curat
 `graph_erase` is **L4** *and* **reserved** to a distinct-party human pair (DPO + workspace_owner)
 with `legal_basis_recorded`. The worst it can do unattended is produce **dry-run** ingests,
 concept extractions, and placement **proposals** — nothing lands in the graph, nothing is
-erased. Every mutation still requires the signed `MutationLog.append` + `signing.sign_bytes`;
+erased. Every mutation still requires a signed append to the host's hash-chained mutation log;
 every erase requires two distinct humans and a signed tombstone. The 3am answer is acceptable
 *because* write and erase are gated and reserved, not because the role is trusted.
 
-## Kill switch (real RVND code)
-`revoke_agent_key(keyid)` in `rvnd/agent_keys.py` revokes the agent's Ed25519 key → its signed
-`graph_write` / `curate_canon` (chain append) and `graph_erase` (tombstone) acts stop
-(`get_agent_key` → `None`, so a signed append can't be attributed to it). And/or **floor the
-granted grade** → the role is reduced to dry-run/propose; L3/L4 writes and erases cannot run.
-`graph_erase`/`curate_canon` stay **reserved** and the write-path prohibitions stay **severed**
-regardless of grade. **Tested:** ✅ exercised 2026-09-03 — `revoke_agent_key` on RVND's live key registry killed the agent (`get_agent_key` → None, signed acts fail-closed); this is the role whose key I revoked in the live proof.
+## Kill switch
+Revoking the role's signing key at the enforcement host stops its signed `graph_write` /
+`curate_canon` (chain append) and `graph_erase` (tombstone) acts — a signed append can no longer
+be attributed to it. And/or **floor the granted grade** → the role is reduced to dry-run/propose;
+L3/L4 writes and erases cannot run. `graph_erase`/`curate_canon` stay **reserved** and the
+write-path prohibitions stay **severed** regardless of grade. A conforming host proves this with
+a load-bearing test (skill-governance-block SPEC §7).
 
 ## Audit trail
-`MutationLog.append` hash-chain + `signing.sign_bytes` receipts (writes); the signed composite
+The host's hash-chained mutation log + its signed receipts (writes); the signed composite
 tombstone (erase); the run's log (dry-runs/proposals).
 
 ## Promotion criteria
