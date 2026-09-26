@@ -1,7 +1,7 @@
 # Lock steward
 
 **ID:** lock-steward
-**Skill:** loomground `knowledge-management` + an enforcement host's egress-lock interface (Privacy Lock)
+**Skill:** `privacy-shield:privacy-shield` (tools `lock_text`, `privacy_scan`) + an enforcement host's egress-lock interface (Privacy Lock)
 **Owner:** Felix (flxk1)
 **Autonomy grade:** L2 — status/classify/propose runs unattended; provision + strengthen held to L3, weaken/unseal to L4
 **Last reviewed:** 2026-09-04

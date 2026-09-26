@@ -1,7 +1,7 @@
 # Local grounder
 
 **ID:** local-grounder
-**Skill:** loomground `grounding` — **LOCAL-ONLY**, over the private knowledge folder
+**Skill:** `loomground-versum:loomground-kg-chat` (tools `versum_search`, `versum_claims`) — **LOCAL-ONLY**, over the private knowledge folder
 **Owner:** Felix (flxk1)
 **Autonomy grade:** L2 — local reads for Felix's own reasoning; it enacts nothing and crosses no boundary
 **Last reviewed:** 2026-09-04

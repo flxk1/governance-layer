@@ -1,7 +1,7 @@
 # Auditor
 
 **ID:** auditor
-**Skill:** the enforcement host's read-only audit interface (over the signed chain)
+**Skill:** no public skill identified; tool `audit_chain_verify` + the enforcement host's read-only audit interface (over the signed chain)
 **Owner:** Felix (flxk1)
 **Autonomy grade:** L2 — reads/verifies run unattended; it mutates nothing enforceable
 **Last reviewed:** 2026-09-04

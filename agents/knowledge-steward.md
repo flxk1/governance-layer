@@ -1,7 +1,7 @@
 # Knowledge steward
 
 **ID:** knowledge-steward
-**Skill:** loomground `knowledge-management`
+**Skill:** `loomground-versum:loomground-knowledge-write` (tools `ingest_text`, `versum_capture`, `versum_suggest`, `versum_confirm`, `versum_canon`, `erasure_sweep`; no public skill currently serves `erasure_sweep`)
 **Owner:** Felix (flxk1)
 **Autonomy grade:** L2 — dry-run/propose runs unattended; write held to L3, erase to L4
 **Last reviewed:** 2026-09-03
@@ -27,7 +27,11 @@ Called on demand — ingest an artifact, curate the canon, run an erasure. No cr
   the host's hash-chained mutation log (SHA-256 `prev_hash` chain) + an Ed25519 signature.
 - **Held (L4, host-only signed):** `graph_erase` → the host's erasure sweep → one signed
   composite tombstone.
-  On any offline/bundled door every write/curate/erase is a **fail-closed HOLD**.
+  On the offline door, the `loomground-mcp` path for versum's write tools (`versum_capture`,
+  `versum_confirm`, `versum_canon`) defaults to a dry run — it reports what would be written and
+  writes nothing — and writes only when called with the explicit `confirm=True` argument. That
+  flag is unsigned and in-process, not a signature; the offline door cannot append to the chain,
+  sign, or mint a tombstone.
 
 ## Reserved / Prohibited (from the block)
 - **Reserved:** `graph_erase` to **distinct parties** {data_protection_officer, workspace_owner};
@@ -55,11 +59,13 @@ Called on demand — ingest an artifact, curate the canon, run an erasure. No cr
 Running amok, the block bounds the blast radius by construction: `direct_write_bypassing_path`,
 `invent_node`, `binary_fetch_in_session` and `unlogged_mutation` are **prohibited** (severed —
 no ungoverned write, no invented node, no unlogged change); `graph_write`/`curate_canon` are
-**L3** (a granted-L2 actor is floored to `human`) and on any bundled path a fail-closed HOLD;
+**L3** (a granted-L2 actor is floored to `human`) and on the offline path a dry run unless the
+caller passes the explicit `confirm=True` argument (an unsigned flag, not a signature);
 `graph_erase` is **L4** *and* **reserved** to a distinct-party human pair (DPO + workspace_owner)
 with `legal_basis_recorded`. The worst it can do unattended is produce **dry-run** ingests,
-concept extractions, and placement **proposals** — nothing lands in the graph, nothing is
-erased. Every mutation still requires a signed append to the host's hash-chained mutation log;
+concept extractions, and placement **proposals**; offline, a write lands only on an explicit
+`confirm=True`, unsigned, and nothing is erased. Every signed mutation requires an append to the
+host's hash-chained mutation log;
 every erase requires two distinct humans and a signed tombstone. The 3am answer is acceptable
 *because* write and erase are gated and reserved, not because the role is trusted.
 

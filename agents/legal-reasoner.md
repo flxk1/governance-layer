@@ -1,7 +1,7 @@
 # Legal reasoner
 
 **ID:** legal-reasoner
-**Skill:** loomground `reasoning`
+**Skill:** `loomground-deontic:deontic` + `loomground-solver:analyse-risks`, `loomground-solver:estimate-liability`, `loomground-solver:litigation-risk-assessor`, `loomground-solver:opponent-modeler`, `loomground-solver:probability-tracker`, `loomground-solver:strategic-analysis`, `loomground-solver:advise-solver-addons` (tools `deontic_parse`, `deontic_conflicts`, `solver_evaluate`, `solver_analyse_risks`, `solver_estimate_liability`, `solver_litigation_risk`, `solver_opponent_model`, `solver_probability`, `solver_strategy`, `solver_advise_addons`)
 **Owner:** Felix (flxk1)
 **Autonomy grade:** L2 — analysis runs unattended; patches held to L3, release to L4
 **Last reviewed:** 2026-09-03

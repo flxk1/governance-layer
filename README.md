@@ -21,7 +21,7 @@ becomes a governed **role**; **an enforcement host enforces** the block, the age
 ## Artifacts
 | File | What |
 |---|---|
-| **[roles.md](roles.md)** | the 3 loomground skills role-ified — each = skill + a full governance-block; which acts are host-only |
+| **[roles.md](roles.md)** | the seven governed roles — each = public skill(s) + a full governance-block; which acts are host-only |
 | **[orchestration.md](orchestration.md)** | the governance-orchestrator's `propose → validate → decide → report` loop over a matter, composing the role-ified skills under the gate; how ctrl:legal invokes it (the enforcement host governs; it never itself disposes a reserved act) |
 
 ## Grounded + verified
@@ -31,11 +31,12 @@ artifacts now accepted after fixing the schema-validity defects verify caught (I
 durations; `grounding-access` demoted from spec-field to `actions[]` guard; `graded`→`auto` verdict).
 
 ## The stack, whole
-**Loomground** (universal skills: grounding · reasoning · knowledge-management) → an **enforcement
+**Loomground** (public skills: `loomground-versum` · `loomground-deontic` · `loomground-solver` ·
+`loomground-governance` · `privacy-shield`) → an **enforcement
 host** (governance-blocks + the signed gate) → **ctrl:legal** (orchestrates the vertical). This
 repo ships the roles and the governance-blocks; it names no specific host and depends on none —
 any host that reads the skill-governance-block spec (github.com/flxk1/skill-governance-block)
 can enforce them.
 
 ---
-*Local, unpushed. Publication reserved. Assisted by Claude (Anthropic); not an author or copyright holder.*
+*Public repository. Assisted by Claude (Anthropic); not an author or copyright holder.*

@@ -1,7 +1,7 @@
 # Policy officer
 
 **ID:** policy-officer
-**Skill:** loomground `governance` (`loomground-governance:loomground`) + an enforcement host's policy-workflow interface
+**Skill:** `loomground-governance:loomground` (tools `solver_evaluate`, `solver_verify`, `policy_compile`, `policy_check`, `versum_search`, `versum_claims`, `lane_evaluate`) + an enforcement host's policy-workflow interface
 **Owner:** Felix (flxk1)
 **Autonomy grade:** L2 — ground/compile/validate runs unattended; apply held to L4, rebind to L3
 **Last reviewed:** 2026-09-04
