@@ -25,7 +25,9 @@ ROLES = [
   "on_boundary": "escalate-with-named-axis",
   "redress": [("disputed_grounding","reviewer",True,None)],
   "budget": {"usd":1,"iters":20},
-  "doors": "Host: a read-only grounding-evidence interface (provenance, ask, cross-workspace read). Bundled: portable read + ground-or-escalate; signs nothing."},
+  "doors": "Host: a read-only grounding-evidence interface (provenance, ask, cross-workspace read). Bundled: portable read + ground-or-escalate; signs nothing.",
+  "tools": ["versum_search", "versum_claims"],
+  "public_skill": "loomground-versum:loomground-kg-chat"},
 
  {"name": "legal-reasoner", "plane": "Loomground · reason",
   "purpose": "Grounded premises to a warranted conclusion (apply, in-force, conflict, effect, deontic). Calls grounder first; enacts nothing alone.",
@@ -38,7 +40,13 @@ ROLES = [
   "on_boundary": "escalate-and-state-gap",
   "redress": [("released_disposition","affected_party",True,"14d")],
   "budget": {"usd":5,"iters":40},
-  "doors": "Host: a legal-reasoning / lens / policy / coverage-matrix interface. release_disposition routes to the host's signed decision gate (reserved)."},
+  "doors": "Host: a legal-reasoning / lens / policy / coverage-matrix interface. release_disposition routes to the host's signed decision gate (reserved).",
+  "tools": ["deontic_parse", "deontic_conflicts", "solver_evaluate", "solver_analyse_risks",
+            "solver_estimate_liability", "solver_litigation_risk", "solver_opponent_model",
+            "solver_probability", "solver_strategy", "solver_advise_addons"],
+  "public_skill": "loomground-deontic:deontic; the loomground-solver:* analysis skills (analyse-risks, "
+                  "estimate-liability, litigation-risk-assessor, opponent-modeler, probability-tracker, "
+                  "strategic-analysis, advise-solver-addons)"},
 
  {"name": "knowledge-steward", "plane": "Loomground · curate",
   "purpose": "Build and maintain the graph: ingest, concepts, placement, write, curate; enrich; erase. The one write/erase authority.",
@@ -51,7 +59,10 @@ ROLES = [
   "on_boundary": "quarantine-or-review-queue",
   "redress": [("graph_erase","subject",False,"30d"),("graph_write","workspace_owner",True,None)],
   "budget": {"usd":5,"iters":40},
-  "doors": "Host: ingest / capture / memory / folder / mirror / erase interfaces. Writes append to the host's signed mutation chain (reserved)."},
+  "doors": "Host: ingest / capture / memory / folder / mirror / erase interfaces. Writes append to the host's signed mutation chain (reserved).",
+  "tools": ["ingest_text", "versum_capture", "versum_suggest", "versum_confirm", "versum_canon", "erasure_sweep"],
+  "public_skill": "loomground-versum:loomground-knowledge-write (ingest/capture/suggest/confirm/canon); "
+                  "no public skill currently serves erasure_sweep — named here, not invented"},
 
  {"name": "lock-steward", "plane": "secure (host-enforced)",
   "purpose": "Provisions and discharges the per-folder egress lock (Privacy Lock). Manages the lock, never exempt. Ratchet + fail-secure.",
@@ -64,7 +75,9 @@ ROLES = [
   "on_boundary": "hold-and-explain",
   "redress": [("lower_threshold","workspace_owner",True,None),("provision_lock","workspace_owner",True,"30d")],
   "budget": {"usd":2,"iters":25},
-  "doors": "Host: an egress-lock interface (setup/threshold/seal/classify/egress_check/ingress_check/audit_query). Mutations signed + reserved; bundled door HOLDs."},
+  "doors": "Host: an egress-lock interface (setup/threshold/seal/classify/egress_check/ingress_check/audit_query). Mutations signed + reserved; bundled door HOLDs.",
+  "tools": ["lock_text", "privacy_scan"],
+  "public_skill": "privacy-shield:privacy-shield"},
 
  {"name": "policy-officer", "plane": "Loomground to enforcement host · govern",
   "purpose": "versum-policy to validated .lg to a human applying it. Makes known policy enforced. Know real-time; enforce-a-change reserved.",
@@ -77,7 +90,11 @@ ROLES = [
   "on_boundary": "hand-off-or-escalate",
   "redress": [("apply_patch","workspace_owner",True,"14d")],
   "budget": {"usd":3,"iters":30},
-  "doors": "Host: a policy-workflow interface (ingest/chat/validate/apply/open/lane-capabilities) plus a policy-declaration interface. apply_patch signed + reserved."},
+  "doors": "Host: a policy-workflow interface (ingest/chat/validate/apply/open/lane-capabilities) plus a policy-declaration interface. apply_patch signed + reserved.",
+  "tools": ["solver_evaluate", "solver_verify", "policy_compile", "policy_check",
+            "versum_search", "versum_claims", "lane_evaluate"],
+  "public_skill": "loomground-governance:loomground (policy_compile/policy_check); "
+                  "no public skill identified for lane_evaluate — named here, not invented"},
 
  {"name": "auditor", "plane": "audit (host-enforced)",
   "purpose": "Read-only over the signed chain (verify_chain/tail/shadow_scan/discipline). Writes nothing but an attributed override. Reports, never repairs.",
@@ -90,7 +107,9 @@ ROLES = [
   "on_boundary": "report-not-repair",
   "redress": [("recorded_override","workspace_owner",True,None)],
   "budget": {"usd":1,"iters":30},
-  "doors": "Host: a read-only audit interface (verify/tail/get-event/shadow-scan/discipline/overrides/record-override). record_override is the only append."},
+  "doors": "Host: a read-only audit interface (verify/tail/get-event/shadow-scan/discipline/overrides/record-override). record_override is the only append.",
+  "tools": ["audit_chain_verify"],
+  "public_skill": "no public skill identified for audit_chain_verify — named here, not invented"},
 
  {"name": "local-grounder", "plane": "Loomground · ground (private) — LOCAL-ONLY",
   "purpose": "Grounds Felix's own work over his private knowledge folder. Firewalled from the product: never ships, never a product dependency, output never reaches the official versum.",
@@ -103,7 +122,9 @@ ROLES = [
   "on_boundary": "hold-local",
   "redress": [("private_grounding","felix",True,None)],
   "budget": {"usd":1,"iters":20},
-  "doors": "No MCP / no signing / no product seam. A local reader over the private folder (Obsidian / local versum / local RAG)."},
+  "doors": "No MCP / no signing / no product seam. A local reader over the private folder (Obsidian / local versum / local RAG).",
+  "tools": ["versum_search", "versum_claims"],
+  "public_skill": "loomground-versum:loomground-kg-chat, pointed at the private folder — never the official versum"},
 ]
 
 
@@ -159,13 +180,17 @@ def build(root: Path | None = None):
         input_sha256 = canonical_hash(role)
         d = out / role["name"]; d.mkdir(parents=True, exist_ok=True)
         desc = f"{role['purpose']} {role['use_when']}".replace('"', "'")   # quote-safe: descriptions carry colons
+        tools_line = ", ".join(role["tools"])
         fm = (f"---\nname: {role['name']}\n"
               f"description: \"{desc}\"\n"
+              f"allowed-tools: {tools_line}\n"
               f"metadata: {{ provenance: {{ stamp: \"{stamp_line(input_sha256)}\" }} }}\n"
               f"{_governance(role)}"
               "---\n")
         body = (f"\n# {role['name']}\n\n**Plane:** {role['plane']}\n\n{role['purpose']}\n\n"
                 f"**Doors.** {role['doors']}\n\n"
+                f"**Public skill.** {role['public_skill']}. `allowed-tools` above is this role's whole "
+                "tool grant, from one source (`ROLES` in `build_role_skills.py`); no other tool is served.\n\n"
                 "## Governance identity\n"
                 "The `governance:` block above is the whole of this skill's authority. A skill is universal; "
                 "the block turns it into a governed **role** that ctrl plans on and an **enforcement "

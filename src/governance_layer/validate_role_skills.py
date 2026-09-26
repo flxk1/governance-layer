@@ -37,6 +37,36 @@ def _frontmatter(text: str) -> str:
     return text[3:end] if end != -1 else ""
 
 
+# Every name a role's `allowed-tools` may carry: confirmed, read-only, against
+# loomground-mcp/src/loomground_mcp/tools/*.py (function name == served MCP tool name) at the
+# commit checked for this port. A tool absent from this set fails validation rather than being
+# silently accepted (build_role_skills.py is the single source of the per-role grant; this list is
+# the corresponding single source of "exists and is served").
+SERVED_TOOLS = frozenset({
+    "versum_search", "versum_claims", "ingest_text", "versum_capture", "versum_suggest",
+    "versum_confirm", "versum_canon", "erasure_sweep", "solver_evaluate", "solver_verify",
+    "solver_manifest", "solver_analyse_risks", "solver_estimate_liability", "solver_litigation_risk",
+    "solver_opponent_model", "solver_probability", "solver_strategy", "solver_advise_addons",
+    "policy_compile", "policy_check", "lane_evaluate", "deontic_parse", "deontic_conflicts",
+    "lock_text", "privacy_scan", "audit_chain_verify",
+})
+
+# Tools whose only effect is a write/mutate/erase kind — never granted to a role whose block
+# prohibits a generic writing kind (SGB litmus §5: a prohibited kind overrides any grant; a tool
+# that only performs the prohibited act has no place in that role's allowed-tools at all).
+WRITE_TOOLS = frozenset({"versum_capture", "ingest_text", "versum_confirm", "versum_canon", "erasure_sweep"})
+
+# Exact prohibited-kind names that mean "this role must never write" — deliberately exact-match,
+# not a substring test: knowledge-steward prohibits `direct_write_bypassing_path` and
+# `unlogged_mutation`, which name a specific bypass/logging failure, not a ban on writing itself
+# (it is declared the one write/erase authority — SPEC §5, `policy`, not a host generic ban).
+GENERIC_WRITE_BAN_KINDS = frozenset({"graph_write", "write_to_official_versum", "mutate_graph", "mutate_policy", "ship"})
+
+
+def _prohibits_writing(prohibited: list) -> bool:
+    return any(k in GENERIC_WRITE_BAN_KINDS for k in (prohibited or []))
+
+
 def validate_root(root: Path) -> tuple[bool, list[str], str]:
     """Schema-check every skills/<role>/SKILL.md under root. Returns (ok, report_lines, input_sha256).
     input_sha256 covers the concatenation of all validated block sources — the report's provenance."""
@@ -66,6 +96,27 @@ def validate_root(root: Path) -> tuple[bool, list[str], str]:
             lines.append(f"OK   {skill.parent.name}  (grade {block.get('grade')}, "
                          f"{len(block.get('actions', []))} actions, "
                          f"{len(block.get('prohibited', []))} prohibited)")
+        # L2: allowed-tools — one non-empty top-level frontmatter field, every name a served
+        # tool, and no write tool for a role whose block prohibits generic writing.
+        raw_tools = (fm.get("allowed-tools") or "").strip()
+        tools = [t.strip() for t in raw_tools.split(",") if t.strip()]
+        if not tools:
+            ok = False
+            lines.append(f"FAIL {skill.parent.name}: no allowed-tools")
+        else:
+            unknown = [t for t in tools if t not in SERVED_TOOLS]
+            if unknown:
+                ok = False
+                lines.append(f"FAIL {skill.parent.name}: allowed-tools names an unserved tool: {unknown}")
+            if _prohibits_writing(block.get("prohibited")):
+                bad = [t for t in tools if t in WRITE_TOOLS]
+                if bad:
+                    ok = False
+                    lines.append(f"FAIL {skill.parent.name}: write tool {bad} granted to a role "
+                                 "whose block prohibits writing")
+            if not unknown and not (_prohibits_writing(block.get("prohibited")) and
+                                    [t for t in tools if t in WRITE_TOOLS]):
+                lines.append(f"OK   {skill.parent.name}  allowed-tools: {tools}")
     lines.append("")
     lines.append("ALL SCHEMA-VALID" if ok else "SCHEMA ERRORS ABOVE")
     return ok, lines, sha256_hex("".join(corpus_parts))

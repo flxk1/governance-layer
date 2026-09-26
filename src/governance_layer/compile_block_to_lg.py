@@ -2,10 +2,26 @@
 and emit it beside the SKILL.md. `validate_lg.sh` then runs the loomground reference validator;
 a block is VALID (SPEC §6) iff its patch is WELL-FORMED.
 
-SPEC §4: (1) one actor at the block grade; (2) one source gate per action (risk + optional grade,
-granted to the actor); (3) reserve/prohibit/obligation/redress lines; (4) a human per role named in
-reserved/redress. Here the action gates pipe into a single obligation-bearing `release` gate that
-egresses to `master` — so master releases iff verdict=auto AND every egress obligation is attached.
+SPEC §4, exactly, and nothing else:
+  1. one `actor`, granted the block `grade`;
+  2. one source `gate` per `actions[]` entry, carrying its `risk` and (if any) `grade`, granted to
+     the actor, each with a `cord` straight to the single `master` (no intermediate gate);
+  3. `reserve`/`prohibit`/`obligation`/`redress` lines from the matching fields;
+  4. a `human` role for every role named in `reserved`/`redress`.
+No other node or cord is emitted — in particular there is no `release` gate. An earlier version of
+this compiler routed every action gate through an intermediate `gate release risk low` with no
+`grant`, so `release` was always `refused` (no actor is ever granted an ungated gate) and no action
+could ever reach `master act`; see the audit report and `tests/test_compile_block_to_lg.py`.
+
+Obligation placement (PO decision, SPEC §3/§7(d)): SPEC §3 gives `obligation <id> on <gate>`, and
+§7(d) requires an unattached obligation to withhold release. The reference language's own
+well-formedness check (`loomground.check`, `obligation on undeclared gate <X>`) requires every
+`obligation ... on X` to name a node whose class is `gate`; `master`'s class is `master`, not `gate`,
+so `obligation <id> on master` does not parse under the reference implementation — one line per
+obligation directly on `master` is not available. Each declared obligation is instead attached to
+*every* action source gate for the role (one `obligation <id> on <kind>` line per action). This is
+well-formed, and because every action gate egresses straight to `master`, it still gates every path
+to `master` under SPEC §7(d).
 
 L0: EMITS a human-reviewed diff; never auto-applies. Every `.lg` is stamped tool+version+input_sha256.
 """
@@ -63,23 +79,26 @@ def compile_block(name: str, block: dict, input_sha256: str = "") -> str:
         L.append(f"human {p} role {p}")
     L.append(f"actor {actor} grade {block['grade']}")
     L.append("")
+    # SPEC §4(2): one source gate per action, granted to the actor, egressing straight to master.
     for a in block["actions"]:
         g = f" grade {a['grade']}" if a.get("grade") else ""
         L.append(f"gate {a['kind']} risk {a['risk']}{g} grant {actor}")
-    L.append("gate release risk low")
     L.append("")
     for a in block["actions"]:
         L.append(f"cord {actor} -> {a['kind']}")
     for a in block["actions"]:
-        L.append(f"cord {a['kind']} -> release")
-    L.append("cord release -> master")
+        L.append(f"cord {a['kind']} -> master")
     L.append("")
     for k in block.get("prohibited", []) or []:
         L.append(f"prohibit {k}")
     for r in block.get("reserved", []) or []:
         L.append(f"reserve {r['kind']} by {_by_syntax(r['by'])}")
+    # PO decision: the reference language rejects `obligation ... on master` (master is not a
+    # `gate`), so each obligation is attached to every action source gate instead (see module
+    # docstring). One `obligation <id> on <kind>` line per (obligation, action) pair.
     for o in block.get("obligations", []) or []:
-        L.append(f"obligation {o} on release")
+        for a in block["actions"]:
+            L.append(f"obligation {o} on {a['kind']}")
     for r in block.get("redress", []) or []:
         s = f"redress {r['kind']} by {r['by'] if isinstance(r['by'], str) else _by_syntax(r['by'])}"
         if r.get("overturn"):
