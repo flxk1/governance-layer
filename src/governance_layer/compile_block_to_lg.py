@@ -2,6 +2,15 @@
 and emit it beside the SKILL.md. `validate_lg.sh` then runs the loomground reference validator;
 a block is VALID (SPEC §6) iff its patch is WELL-FORMED.
 
+Canonical-compiler decision: `skill-governance-block/reference/compile_block_to_lg.py` is
+canonical for SPEC §4 (see that repo's README.md "Canonical compiler" section and its
+`reference/__init__.py`). This module is NOT an import of that canonical module — sgb's own
+decision (recorded there) declines to make governance-layer import it, since that would mean
+editing governance-layer from sgb's task, which is out of that leg's territory. This module is
+instead a parity-tested copy: `tests/test_compiler_parity.py` proves byte-for-byte identical
+output between this compiler and the canonical one for every role block plus sgb's own worked
+example. If the two ever diverge, the canonical copy governs the spec's meaning.
+
 SPEC §4, exactly, and nothing else:
   1. one `actor`, granted the block `grade`;
   2. one source `gate` per `actions[]` entry, carrying its `risk` and (if any) `grade`, granted to
