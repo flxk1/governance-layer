@@ -6,8 +6,9 @@ A real, normal-installer path. The seven roles are packaged as a **plugin** whos
 
 ## What you get
 `skills/<role>/SKILL.md` × 7 (grounder · legal-reasoner · knowledge-steward · lock-steward ·
-policy-officer · auditor · local-grounder), each schema-valid against
-`../skill-governance-block/schema/governance-block.schema.json`, plus `.claude-plugin/plugin.json`.
+policy-officer · auditor · local-grounder), each schema-valid against the skill-governance-block
+schema (bundled as `src/governance_layer/schema/governance-block.schema.json`), plus
+`.claude-plugin/plugin.json`.
 
 ## Prerequisites (Tier 3 — installed once)
 1. **An enforcement host** that speaks the skill-governance-block spec

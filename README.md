@@ -53,5 +53,6 @@ repo ships the roles and the governance-blocks; it names no specific host and de
 any host that reads the skill-governance-block spec (github.com/flxk1/skill-governance-block)
 can enforce them.
 
----
-*Public repository. Assisted by Claude (Anthropic); not an author or copyright holder.*
+## How this is made
+
+The code and documentation are written with Loomground agents running on Claude (Anthropic). The maintainer reads and corrects all of it.
