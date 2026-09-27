@@ -1,15 +1,19 @@
 # Governance Layer
 
-Turn universal loomground skills into governed roles, each carrying the governance block an enforcement host reads.
+Turn universal loomground skills into governed roles: compile, register, and bind each skill's
+own governance block to an enforcement host's doors.
 
 Every governed act gets its **authoritative signed door**. This is the enforcement
 plane — separate from Loomground (grounding) and ctrl (orchestration).
-*"Loomground is universal; via an enforcement host and ctrl:legal these skills
-become governance capabilities."*
+*"Every shipped Loomground skill declares its own governance block; via an enforcement host and
+ctrl:legal this layer compiles, registers, and binds that block to host doors, turning the skill
+into a governed role."*
 
 ## The move
-A loomground skill is universal and carries no authority. Bind it a **governance-block** and it
-becomes a governed **role**; **an enforcement host enforces** the block, the agent-registry records it.
+Every shipped loomground skill declares its own governance block, but the skill itself has no
+grade, gate, or decision authority. This layer **compiles, registers, and binds** that declared
+block to the host's doors, turning the skill into a governed **role**; **an enforcement host
+enforces** the block, the agent-registry records it.
 
 - **Governance-block = 8 spec fields** (`skill-governance-block`): `grade · actions · reserved ·
   prohibited · obligations · on-boundary · redress · budget`. **Access-scope is NOT a spec field** —
