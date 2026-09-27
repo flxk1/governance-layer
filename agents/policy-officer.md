@@ -1,7 +1,7 @@
 # Policy officer
 
 **ID:** policy-officer
-**Skill:** loomground `governance` (`loomground-governance:loomground`) + an enforcement host's policy-workflow interface
+**Skill:** `loomground-governance:loomground` (tools `solver_evaluate`, `solver_verify`, `policy_compile`, `policy_check`, `versum_search`, `versum_claims`, `lane_evaluate`) + an enforcement host's policy-workflow interface
 **Owner:** Felix (flxk1)
 **Autonomy grade:** L2 — ground/compile/validate runs unattended; apply held to L4, rebind to L3
 **Last reviewed:** 2026-09-04
@@ -31,6 +31,13 @@ to a new policy. No cron (the real-time *feed* that notices new policy is LG2, s
 - **Held (L4, host-only signed, reserved):** `apply_patch` → writes the policy to the signed
   chain — the act that changes what the gate enforces. On any offline/bundled door both are
   fail-closed HOLDs.
+
+**Offline door — HOLD.** On the offline door every signed or stateful act on the governed
+graph — `graph_write`, `curate_canon`, `graph_erase`, `apply_patch`, `rebind_lane`,
+`release_disposition`, `record_override`, `emit_provenance_receipt`, and every lock mutation
+(`provision_lock`, `raise_threshold`, `lower_threshold`, `downgrade_backend`, `unseal`) — is a
+HOLD. Offline tools may write only a local, unsigned working folder, and only after an explicit
+confirm (a dry run is the default); that folder is not the governed record.
 
 ## Reserved / Prohibited (from the block)
 - **Reserved:** `apply_patch` + `rebind_lane` to `workspace_owner` (the human who confirms the enforced change).

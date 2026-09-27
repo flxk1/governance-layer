@@ -16,7 +16,7 @@ capabilities.
 |-------|-----------|------------|
 | **ctrl** (`ctrl:legal`) | orchestrates the matter — intake, mode, dispatch, report | sign, gate, decide the verdict |
 | **enforcement** (this layer) | GOVERNS — plans + gates every consequential act, chains it, mints/erases | ground a claim; dispose a reserved act |
-| **loomground** (3 skills) | grounds/reasons/builds — the capabilities | carry governance identity (no grade, no gate) |
+| **loomground** (public skills) | grounds/reasons/builds — the capabilities | carry governance identity (no grade, no gate) |
 
 The loomground skills state their own boundary: each is a *capability skill* that "carries no
 governance identity — no grade, no governance-block, no decision-authority." This layer supplies
@@ -32,11 +32,11 @@ An enforcement host ENFORCES the block; the agent-registry records it. The block
 time by the host's signed decision gate, and at 3am is a *reading of the block*, not a live
 judgement call.
 
-| ROLE | loomground skill | grade | access-scope (descriptive) | reserved (→ WHO) | prohibited |
+| ROLE | public skill | grade | access-scope (descriptive) | reserved (→ WHO) | prohibited |
 |------|------------------|-------|-----------------|------------------|------------|
-| **grounder** | `grounding/SKILL.md` | L2 | read: versum via `loomground-versum:loomground-kg-chat` + `loomground_legal` | — (read-only, escalates on UNCERTAIN) | assert un-confirmed coordinate as confirmed |
-| **reasoner** | `reasoning/SKILL.md` | L2 | read (via grounder first) | conflict-resolution *disposition* → GCO/counsel | reason over un-confirmed premise; emit bare verdict |
-| **km / builder** | `knowledge-management/SKILL.md` | L1 | **write** (single path `loomground-versum:loomground-knowledge-write`) | curate/mint into confirmed layer → data-owner; **erase** → controller | any write outside the single path; invent nodes |
+| **grounder** | `loomground-versum:loomground-kg-chat` | L2 | read: versum via `loomground-versum:loomground-kg-chat` + `loomground_legal` | — (read-only, escalates on UNCERTAIN) | assert un-confirmed coordinate as confirmed |
+| **reasoner** | `loomground-deontic:deontic` + `loomground-solver:*` | L2 | read (via grounder first) | conflict-resolution *disposition* → GCO/counsel | reason over un-confirmed premise; emit bare verdict |
+| **km / builder** | `loomground-versum:loomground-knowledge-write` | L1 | **write** (single path `loomground-versum:loomground-knowledge-write`) | curate/mint into confirmed layer → data-owner; **erase** → controller | any write outside the single path; invent nodes |
 
 Grade + reserved + budget are the load-bearing fields — they decide whether an act is `auto`,
 held for `human`, or `reserved`.
@@ -56,10 +56,12 @@ ctrl:legal (vertical orchestrator)
    ▼
 governance orchestrator ──────────────── loop over the matter ────────────┐
                                                                             │
-  1 PROPOSE   grounder role  ── loomground grounding ──► confirmed evidence │
+  1 PROPOSE   grounder role  ──────────────────────────► confirmed evidence │
+              via loomground-versum:loomground-kg-chat                      │
               (ground-or-escalate; UNCERTAIN ⇒ no proposal, escalate)       │
                                                                             │
-  2 VALIDATE  reasoner role  ── loomground reasoning ──► warranted claim    │
+  2 VALIDATE  reasoner role  ──────────────────────────► warranted claim    │
+              via loomground-deontic:deontic + loomground-solver:*          │
               + confirmed-bar check; premise gaps named, not fabricated     │
                                                                             │
   3 DECIDE    the host's signed decision gate ─► a Loomground verdict       │
@@ -84,26 +86,34 @@ Refusal (**`prohibited`**) is a valid, expected outcome — an unplanned or refu
 ## 4. Dual transport — the offline door vs the host-connected door
 
 Every governance function has two doors. A **signed / stateful / authoritative** act is
-**host-only**; the offline path is a **fail-closed hold**, never a computed result.
+**host-only**; the offline path cannot perform it.
+
+**Offline door — HOLD.** On the offline door every signed or stateful act on the governed
+graph — `graph_write`, `curate_canon`, `graph_erase`, `apply_patch`, `rebind_lane`,
+`release_disposition`, `record_override`, `emit_provenance_receipt`, and every lock mutation
+(`provision_lock`, `raise_threshold`, `lower_threshold`, `downgrade_backend`, `unseal`) — is a
+HOLD. Offline tools may write only a local, unsigned working folder, and only after an explicit
+confirm (a dry run is the default); that folder is not the governed record.
 
 | Function | Offline/bundled skill (portable, CANNOT sign) | Host-connected door (authoritative, signed) |
 |----------|----------------------------------------|-----------------------------------|
-| plan + gate a disposition | evaluates block, returns *advisory* verdict, **holds** on any consequential act | the host's orchestrate call → its signed decision gate (a signed verdict) |
+| plan + gate a disposition | evaluates block, returns *advisory* verdict; the consequential act is a HOLD | the host's orchestrate call → its signed decision gate (a signed verdict) |
 | ground / reason (read) | runs loomground skill locally | the host's grounder / legal / lens interfaces |
-| append to the chain / mint receipt | **fail-closed hold** (cannot sign) | the host's capture / audit interfaces → a signed hash-chain append |
-| erase (signed tombstone) | **fail-closed hold** | the host's erase interface → controller-key tombstone |
+| versum write (capture / confirm / canon) | HOLD for the governed graph; dry run by default; `confirm=True` writes only a local, unsigned working folder — not the governed record, not a signature, chain entry, or receipt | the host's capture interface → a signed hash-chain append |
+| append to the chain / mint receipt | HOLD (cannot sign) | the host's capture / audit interfaces → a signed hash-chain append |
+| erase (signed tombstone) | HOLD (cannot sign) | the host's erase interface → controller-key tombstone |
 | record the block in registry | drafts the row | the host's contract / policy interfaces |
 | conformity / release check | advisory checklist | the host's conformity interface |
 
-Rule: if it signs, chains, mints a receipt, or erases → host-connected only. Offline/bundled = advise-and-hold.
+Rule: if it signs, chains, mints a receipt, erases, or writes the governed graph → host-connected only; on the offline door it is a HOLD. Offline/bundled = advise; it performs no signed act.
 
 ---
 
-## 5. The single release gate + the reserved-acts hold
+## 5. The single decision gate + the reserved-acts hold
 
-- **One release gate.** The whole loop funnels to a single signed-decision-gate call per
+- **One decision gate.** The whole loop funnels to a single signed-decision-gate call per
   consequential act (surfaced as the sign-off panel). `human` routes to human sign-off;
-  the release is not "computed" — it is *gated*.
+  the act is not "computed" — it is *gated*.
 - **Reserved-acts hold.** A reservation mapping ties detected issue types to
   the human act the law reserves — e.g. AI Act (Reg. 2024/1689) Art. 14 → `ai-oversight-officer`
   *authorize*; controller sign for a data disposition; qualified counsel *sign* for legal opinions.

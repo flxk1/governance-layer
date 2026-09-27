@@ -1,7 +1,7 @@
 # Legal reasoner
 
 **ID:** legal-reasoner
-**Skill:** loomground `reasoning`
+**Skill:** `loomground-deontic:deontic` + `loomground-solver:analyse-risks`, `loomground-solver:estimate-liability`, `loomground-solver:litigation-risk-assessor`, `loomground-solver:opponent-modeler`, `loomground-solver:probability-tracker`, `loomground-solver:strategic-analysis`, `loomground-solver:advise-solver-addons` (tools `deontic_parse`, `deontic_conflicts`, `solver_evaluate`, `solver_analyse_risks`, `solver_estimate_liability`, `solver_litigation_risk`, `solver_opponent_model`, `solver_probability`, `solver_strategy`, `solver_advise_addons`)
 **Owner:** Felix (flxk1)
 **Autonomy grade:** L2 — analysis runs unattended; patches held to L3, release to L4
 **Last reviewed:** 2026-09-03
@@ -28,6 +28,13 @@ Called on demand with a legal question. No cron.
 - **Held (L4, host-only signed gate):** `release_disposition` → the host's signed decision gate,
   yielding a Loomground verdict (`auto / human / reserved / prohibited`), and on `auto` an
   audit-triple receipt to the chain. Any offline/bundled path **HOLDs** — it cannot sign or gate.
+
+**Offline door — HOLD.** On the offline door every signed or stateful act on the governed
+graph — `graph_write`, `curate_canon`, `graph_erase`, `apply_patch`, `rebind_lane`,
+`release_disposition`, `record_override`, `emit_provenance_receipt`, and every lock mutation
+(`provision_lock`, `raise_threshold`, `lower_threshold`, `downgrade_backend`, `unseal`) — is a
+HOLD. Offline tools may write only a local, unsigned working folder, and only after an explicit
+confirm (a dry run is the default); that folder is not the governed record.
 
 ## Reserved / Prohibited (from the block)
 - **Reserved:** `release_disposition` to a **quorum of 2** distinct parties

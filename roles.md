@@ -9,14 +9,23 @@ skill + a **governance-block** (skill-governance-block v0.1 schema). An enforcem
 capabilities."
 
 ## Dual transport (per role, every function)
-- **Offline/bundled skill door** — portable, fail-closed, **CANNOT sign**. Any
-  signed/stateful/authoritative act on this path is a **fail-closed HOLD**, never a computed
-  result.
+- **Offline/bundled skill door** — portable, **CANNOT sign**; no signed act is performed on
+  this path. For versum's write tools (`versum_capture`, `versum_confirm`, `versum_canon`) the
+  explicit confirm named below is the `loomground-mcp` tool's `confirm=True` argument, and it
+  writes only the local working folder: an unsigned, in-process flag, not a signature, a
+  hash-chained mutation-log entry, or a signed receipt.
 - **Host-connected door** — the enforcement host's own interface, authoritative, **signed**.
-- **Host-only acts** (an offline path here returns HOLD, not a value): gate a released
+- **Host-only acts** (the offline path cannot perform them): gate a released
   disposition · append to the chain · mint/verify a receipt · erase — each requires the host's
   signed decision gate, its hash-chained mutation log, its signed receipts, and its signed
   tombstone erasure, respectively.
+
+**Offline door — HOLD.** On the offline door every signed or stateful act on the governed
+graph — `graph_write`, `curate_canon`, `graph_erase`, `apply_patch`, `rebind_lane`,
+`release_disposition`, `record_override`, `emit_provenance_receipt`, and every lock mutation
+(`provision_lock`, `raise_threshold`, `lower_threshold`, `downgrade_backend`, `unseal`) — is a
+HOLD. Offline tools may write only a local, unsigned working folder, and only after an explicit
+confirm (a dry run is the default); that folder is not the governed record.
 
 Verdict vocabulary (skill-governance-block SPEC §3, the Loomground join): **auto / human /
 reserved / prohibited**, joined strictest-wins (`prohibited > reserved > refused > human > auto`).
@@ -24,7 +33,8 @@ Grade ladder L0<…<L6.
 
 ---
 
-## ROLE 1 — `grounder`  (skill: loomground `grounding`)
+## ROLE 1 — `grounder`  (skill: `loomground-versum:loomground-kg-chat`)
+Public skill: `loomground-versum:loomground-kg-chat`. Tools: `versum_search`, `versum_claims`.
 Read-only evidence-at-coordinate + provenance, or ground-or-escalate. Serves; never writes.
 
 ```
@@ -60,13 +70,21 @@ governance:
   budget: { usd: 1, iters: 20 }
 ```
 - **Host door:** a read-only grounding-evidence interface (provenance, ask, cross-workspace read).
-- **Host-only (signed):** `emit_provenance_receipt` → the host's signed receipt + chain; any
-  offline door returns the evidence but **HOLDs** the signed receipt.
+- **Host-only (signed):** `emit_provenance_receipt` → the host's signed receipt + chain; the
+  offline door returns the evidence but cannot mint the signed receipt.
 - **Offline door:** portable read + ground-or-escalate; fully usable offline, signs nothing.
+  `emit_provenance_receipt` is a HOLD.
 
 ---
 
-## ROLE 2 — `legal-reasoner`  (skill: loomground `reasoning`)
+## ROLE 2 — `legal-reasoner`  (skills: `loomground-deontic:deontic` + `loomground-solver:*`)
+Public skills: `loomground-deontic:deontic`, `loomground-solver:analyse-risks`,
+`loomground-solver:estimate-liability`, `loomground-solver:litigation-risk-assessor`,
+`loomground-solver:opponent-modeler`, `loomground-solver:probability-tracker`,
+`loomground-solver:strategic-analysis`, `loomground-solver:advise-solver-addons`. Tools:
+`deontic_parse`, `deontic_conflicts`, `solver_evaluate`, `solver_analyse_risks`,
+`solver_estimate_liability`, `solver_litigation_risk`, `solver_opponent_model`,
+`solver_probability`, `solver_strategy`, `solver_advise_addons`.
 Grounded premises → warranted conclusion (apply → in-force → rank-conflict → effect → deontic O/P/F
 → optional quantified/adversarial → optional `.lg` patch). Calls `grounder` first; decides nothing alone.
 
@@ -106,11 +124,15 @@ governance:
   a Loomground verdict (`auto/human/reserved/prohibited`), and on `auto` an audit-triple receipt
   to the chain. A reserved quorum action is held/`reserved` until distinct-party sign-off.
 - **Offline door:** emits the warranted conclusion / `.lg` patch as **provisional (unsigned)**;
-  releasing a disposition is a **HOLD** — the offline path cannot sign or gate.
+  releasing a disposition is host-only — `release_disposition` is a HOLD; the offline path
+  cannot sign or gate.
 
 ---
 
-## ROLE 3 — `knowledge-steward`  (skill: loomground `knowledge-management`)
+## ROLE 3 — `knowledge-steward`  (skill: `loomground-versum:loomground-knowledge-write`)
+Public skill: `loomground-versum:loomground-knowledge-write`. Tools: `ingest_text`,
+`versum_capture`, `versum_suggest`, `versum_confirm`, `versum_canon`, `erasure_sweep` (no public
+skill currently serves `erasure_sweep`).
 Build/maintain the graph asset: ingest (dry-run) → concepts → placement → **write** → curate; enrich;
 loomground-capture:capture-session; **erase**. The one write/erase authority in this layer.
 
@@ -156,13 +178,17 @@ governance:
     chain) + an **Ed25519 signature** (over canonical-content|prev_hash) → verifiable receipt.
   - `graph_erase` → the host's **erasure sweep** → **one signed composite tombstone**, reserved to
     a distinct-party human pair.
-- **Offline door:** ingest **dry-run**, concept extraction, placement **proposals** only. Every
-  `graph_write` / `curate_canon` / `graph_erase` is a **fail-closed HOLD** — the portable skill
-  cannot append to the chain, sign, or mint a tombstone.
+- **Offline door:** ingest **dry-run**, concept extraction, placement **proposals**.
+  `graph_write`, `curate_canon` and `graph_erase` are a HOLD: the offline door cannot append to
+  the chain, sign, or mint a tombstone. versum's write tools (`versum_capture`,
+  `versum_confirm`, `versum_canon`) on the `loomground-mcp` offline path dry-run by default; an
+  explicit `confirm=True` writes only a local, unsigned working folder, which is not the
+  governed record and is not a `graph_write`.
 
 ---
 
-## ROLE 4 — `lock-steward`  (skill: secure / Privacy Lock, host-enforced)
+## ROLE 4 — `lock-steward`  (skill: `privacy-shield:privacy-shield`, host-enforced)
+Public skill: `privacy-shield:privacy-shield`. Tools: `lock_text`, `privacy_scan`.
 Provisions and discharges the per-folder egress lock. Manages the lock, never exempt from it.
 Ratchet + fail-secure: secure default backend, no silent weakening, every change chained.
 
@@ -206,12 +232,15 @@ governance:
 ```
 - **Host door:** an egress-lock interface (setup/threshold_set/seal/classify/egress_check/ingress_check/audit_query).
 - **Host-only (signed + reserved):** provision/threshold/backend/unseal mutations → signed chain event;
-  any offline door **HOLDs** every mutation. Weakenings are distinct-party reserved.
+  on the offline door every lock mutation is a HOLD. Weakenings are distinct-party reserved.
 - **Offline door:** status + classify + egress/ingress *checks* only; signs nothing, mutates nothing.
 
 ---
 
-## ROLE 5 — `policy-officer`  (skill: Loomground→enforcement host `govern`)
+## ROLE 5 — `policy-officer`  (skill: `loomground-governance:loomground` → enforcement host)
+Public skill: `loomground-governance:loomground` (serves `policy_compile` / `policy_check`). Tools:
+`solver_evaluate`, `solver_verify`, `policy_compile`, `policy_check`, `versum_search`,
+`versum_claims`, `lane_evaluate`.
 versum-policy → validated `.lg` twin → a **human** applies it. Makes known policy enforced.
 Knowing/compiling policy is unattended; enforcing a change is reserved.
 
@@ -245,11 +274,13 @@ governance:
 - **Host door:** a policy-workflow interface (ingest/chat/validate/apply/open/lane-capabilities)
   plus a policy-declaration interface.
 - **Host-only (signed + reserved):** `apply_patch` → the signed enforce, reserved to the workspace owner.
-- **Offline door:** ground + compile the `.lg` twin + validate — all **provisional**; applying is a HOLD.
+- **Offline door:** ground + compile the `.lg` twin + validate — all **provisional**; applying is host-only.
+  `apply_patch` and `rebind_lane` are a HOLD.
 
 ---
 
-## ROLE 6 — `auditor`  (skill: audit, host-enforced)
+## ROLE 6 — `auditor`  (no public skill; tool `audit_chain_verify`, host-enforced)
+Public skill: none identified. Tool: `audit_chain_verify`.
 Read-only over the signed chain. Writes nothing but an **attributed override**. Reports, never repairs.
 
 ```
@@ -281,10 +312,13 @@ governance:
 - **Host door:** a read-only audit interface (verify_chain/tail/get_event/shadow_scan/discipline/overrides/record_override).
 - **The only append** is `record_override` — an attributed, rationale-bearing note; nothing else mutates.
 - **Offline door:** verify + tail + scan; a portable read of the chain. Repairs nothing.
+  `record_override` is a HOLD — the offline door appends nothing to the chain.
 
 ---
 
-## ROLE 7 — `local-grounder`  (skill: Loomground `ground` — LOCAL-ONLY, private)
+## ROLE 7 — `local-grounder`  (skill: `loomground-versum:loomground-kg-chat` — LOCAL-ONLY, private)
+Public skill: `loomground-versum:loomground-kg-chat`, pointed at the private folder. Tools:
+`versum_search`, `versum_claims`.
 Grounds **Felix's own** work over his **private** knowledge folder. Firewalled from the product:
 never ships, never a product dependency, output never reaches the official versum. The mirror-image
 of `grounder` — same read discipline, opposite firewall.
@@ -331,4 +365,6 @@ governance:
 - **Load-bearing invariants (per SGB §7):** a below-grade action → `human`; a reserved
   action → `reserved` (held until sign-off); a prohibited kind → `prohibited` (severed); an unattached
   obligation withholds release.
+- The obligation invariant of SGB §7(d) — an unattached obligation withholds release — is
+  exercised by a host, not by this compiler or evaluator: obligations attach by declaration.
 ```

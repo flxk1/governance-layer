@@ -1,7 +1,7 @@
 # Lock steward
 
 **ID:** lock-steward
-**Skill:** loomground `knowledge-management` + an enforcement host's egress-lock interface (Privacy Lock)
+**Skill:** `privacy-shield:privacy-shield` (tools `lock_text`, `privacy_scan`) + an enforcement host's egress-lock interface (Privacy Lock)
 **Owner:** Felix (flxk1)
 **Autonomy grade:** L2 — status/classify/propose runs unattended; provision + strengthen held to L3, weaken/unseal to L4
 **Last reviewed:** 2026-09-04
@@ -35,6 +35,13 @@ act needs its `egress_check` discharge. No cron.
 - **Held (L4, host-only signed):** `lower_threshold`, `downgrade_backend`, `unseal` — the *weaken*
   direction; each carries `accepted_by` + `reason`.
   On any offline/bundled door every provision/threshold/seal/unseal is a **fail-closed HOLD**.
+
+**Offline door — HOLD.** On the offline door every signed or stateful act on the governed
+graph — `graph_write`, `curate_canon`, `graph_erase`, `apply_patch`, `rebind_lane`,
+`release_disposition`, `record_override`, `emit_provenance_receipt`, and every lock mutation
+(`provision_lock`, `raise_threshold`, `lower_threshold`, `downgrade_backend`, `unseal`) — is a
+HOLD. Offline tools may write only a local, unsigned working folder, and only after an explicit
+confirm (a dry run is the default); that folder is not the governed record.
 
 ## Reserved / Prohibited (from the block)
 - **Reserved:** `provision_lock` + `unseal` to `workspace_owner`; `lower_threshold` +

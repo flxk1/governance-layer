@@ -26,6 +26,13 @@ has ROLE blocks: the 7 governed roles derive from `roles.md`; a meta-row derives
   host stops its signed acts, and/or flooring the granted grade → below-required acts fall to
   `human`. `prohibited`/`reserved` sever or withhold regardless of grade.
 
+**Offline door — HOLD.** On the offline door every signed or stateful act on the governed
+graph — `graph_write`, `curate_canon`, `graph_erase`, `apply_patch`, `rebind_lane`,
+`release_disposition`, `record_override`, `emit_provenance_receipt`, and every lock mutation
+(`provision_lock`, `raise_threshold`, `lower_threshold`, `downgrade_backend`, `unseal`) — is a
+HOLD. Offline tools may write only a local, unsigned working folder, and only after an explicit
+confirm (a dry run is the default); that folder is not the governed record.
+
 | id | name | purpose | grade | owner | kill switch | last-reviewed |
 |---|---|---|---|---|---|---|
 | `grounder` | Grounder | read-only evidence-at-coordinate + provenance, or ground-or-escalate; serves, never writes | **L2** | Felix (flxk1) | Revoking the role's key → signed `emit_provenance_receipt` (L3) stops; floor grant → all serve floors to `human`. `graph_write`/`binary_fetch`/`fabricate_citation` **prohibited** (severed) | 2026-09-03 |

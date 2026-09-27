@@ -1,7 +1,7 @@
 # Local grounder
 
 **ID:** local-grounder
-**Skill:** loomground `grounding` — **LOCAL-ONLY**, over the private knowledge folder
+**Skill:** `loomground-versum:loomground-kg-chat` (tools `versum_search`, `versum_claims`) — **LOCAL-ONLY**, over the private knowledge folder
 **Owner:** Felix (flxk1)
 **Autonomy grade:** L2 — local reads for Felix's own reasoning; it enacts nothing and crosses no boundary
 **Last reviewed:** 2026-09-04
@@ -25,6 +25,13 @@ Called when Felix wants his private knowledge folder to inform his own reasoning
 ## Grade — unattended vs held
 - **Unattended (L2):** `ground_private`, `read_private_evidence` — local reads only.
 - **Held:** none — it signs nothing and mints no receipt; it has no MCP/product seam to hold.
+
+**Offline door — HOLD.** On the offline door every signed or stateful act on the governed
+graph — `graph_write`, `curate_canon`, `graph_erase`, `apply_patch`, `rebind_lane`,
+`release_disposition`, `record_override`, `emit_provenance_receipt`, and every lock mutation
+(`provision_lock`, `raise_threshold`, `lower_threshold`, `downgrade_backend`, `unseal`) — is a
+HOLD. Offline tools may write only a local, unsigned working folder, and only after an explicit
+confirm (a dry run is the default); that folder is not the governed record.
 
 ## Reserved / Prohibited (from the block)
 - **Reserved:** none — local, private; nothing enacted, nothing crosses.

@@ -18,10 +18,21 @@ becomes a governed **role**; **an enforcement host enforces** the block, the age
   (a Loomground verdict — `auto / human / reserved / prohibited`, joined strictest-wins), landed
   on a signed hash-chain, provable by replaying the chain.
 
+**Offline door — HOLD.** On the offline door every signed or stateful act on the governed
+graph — `graph_write`, `curate_canon`, `graph_erase`, `apply_patch`, `rebind_lane`,
+`release_disposition`, `record_override`, `emit_provenance_receipt`, and every lock mutation
+(`provision_lock`, `raise_threshold`, `lower_threshold`, `downgrade_backend`, `unseal`) — is a
+HOLD. Offline tools may write only a local, unsigned working folder, and only after an explicit
+confirm (a dry run is the default); that folder is not the governed record.
+
+The obligation invariant of the skill-governance-block spec (SGB) §7(d) — an unattached
+obligation withholds release — is exercised by a host, not by this compiler or evaluator:
+obligations attach by declaration.
+
 ## Artifacts
 | File | What |
 |---|---|
-| **[roles.md](roles.md)** | the 3 loomground skills role-ified — each = skill + a full governance-block; which acts are host-only |
+| **[roles.md](roles.md)** | the seven governed roles — each = public skill(s) + a full governance-block; which acts are host-only |
 | **[orchestration.md](orchestration.md)** | the governance-orchestrator's `propose → validate → decide → report` loop over a matter, composing the role-ified skills under the gate; how ctrl:legal invokes it (the enforcement host governs; it never itself disposes a reserved act) |
 
 ## Grounded + verified
@@ -31,11 +42,12 @@ artifacts now accepted after fixing the schema-validity defects verify caught (I
 durations; `grounding-access` demoted from spec-field to `actions[]` guard; `graded`→`auto` verdict).
 
 ## The stack, whole
-**Loomground** (universal skills: grounding · reasoning · knowledge-management) → an **enforcement
+**Loomground** (public skills: `loomground-versum` · `loomground-deontic` · `loomground-solver` ·
+`loomground-governance` · `privacy-shield`) → an **enforcement
 host** (governance-blocks + the signed gate) → **ctrl:legal** (orchestrates the vertical). This
 repo ships the roles and the governance-blocks; it names no specific host and depends on none —
 any host that reads the skill-governance-block spec (github.com/flxk1/skill-governance-block)
 can enforce them.
 
 ---
-*Local, unpushed. Publication reserved. Assisted by Claude (Anthropic); not an author or copyright holder.*
+*Public repository. Assisted by Claude (Anthropic); not an author or copyright holder.*

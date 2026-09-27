@@ -15,7 +15,7 @@ real-time ingest can make policy *known* — it cannot silently change what is *
   (2) KNOW        grounder            the host's grounding-evidence interface / kg-chat  -> policy queryable at coordinate, real-time
         |                             (CONFIRMED-only) + the host's live governance board    (current enforced policy)
         v
-  (3) NOTICE      (LG2 feed)          an L-CORPUS-style watch flags NEW/changed policy to the policy-officer   [DESIGN — not built]
+  (3) NOTICE      (LG2 feed)          an L-CORPUS-style watch flags NEW/changed policy to the policy-officer   [src/governance_layer/policy_notice.py]
         |
         v
   (4) COMPILE     policy-officer      loomground-governance:loomground / the host's        -> validated .lg twin (express/policy/host)
@@ -41,7 +41,7 @@ real-time ingest can make policy *known* — it cannot silently change what is *
 | Stage | Role | Plane |
 |-------|------|-------|
 | ingest / know | knowledge-steward · grounder | Loomground |
-| notice (feed) | LG2 watch (to build) | ctrl (loop) |
+| notice (feed) | LG2 watch (`src/governance_layer/policy_notice.py`) | ctrl (loop) |
 | compile / apply / rebind | policy-officer | Loomground `governance` → the enforcement host's policy-workflow interface |
 | enforce | the gate (the host's signed decision gate) + lock-steward (`egress_check`) | enforcement host |
 | audit | auditor | the enforcement host's audit interface |
@@ -56,13 +56,19 @@ real-time ingest can make policy *known* — it cannot silently change what is *
 - **Tighten-only widening.** Widening authority is a deliberate owner patch act; `authority_revoke` is the
   only tighten-in-passing (`self_widen_authority` prohibited).
 - **Two enforcement axes.** The gate governs *who/grade/reserved/prohibited*; `egress_check` governs *what
-  content crosses*. Both must pass — the `egress_minimised` obligation binds the second into the release gate.
+  content crosses*. Both must pass — the `egress_minimised` obligation binds the second into each action's gate.
 - **Write-nothing audit.** The auditor reports; it cannot repair, mutate the graph, or apply policy.
+- **Offline door — HOLD.** On the offline door every signed or stateful act on the governed
+  graph — `graph_write`, `curate_canon`, `graph_erase`, `apply_patch`, `rebind_lane`,
+  `release_disposition`, `record_override`, `emit_provenance_receipt`, and every lock mutation
+  (`provision_lock`, `raise_threshold`, `lower_threshold`, `downgrade_backend`, `unseal`) — is a
+  HOLD. Offline tools may write only a local, unsigned working folder, and only after an explicit
+  confirm (a dry run is the default); that folder is not the governed record.
 
 ## Build state
 - Built (local): the roles — grounder, legal-reasoner, knowledge-steward (CT1–CT4 egress obligations),
   lock-steward, **policy-officer**, **auditor**.
-- Built (local): **LG2** the real-time NOTICE feed — `loops/policy_notice.py` (+ `test_policy_notice.py`,
+- Built (local): **LG2** the real-time NOTICE feed — `src/governance_layer/policy_notice.py` (+ `tests/test_policy_notice.py`,
   6/6). Scans an out-of-band policy diff → routes actionable **confirmed** policy changes to the
   policy-officer, **HOLDS** unconfirmed, flags a **repeal** for retire (tighten), **quarantines** malformed,
   and **enacts nothing** (the asserted invariant — compiles/applies no policy; that stays stage 4/5).

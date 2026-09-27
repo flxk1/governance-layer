@@ -1,7 +1,7 @@
 # Grounder
 
 **ID:** grounder
-**Skill:** loomground `grounding`
+**Skill:** `loomground-versum:loomground-kg-chat` (tools `versum_search`, `versum_claims`)
 **Owner:** Felix (flxk1)
 **Autonomy grade:** L2 — read-only serve runs unattended; the signed receipt is held to L3
 **Last reviewed:** 2026-09-03
@@ -22,7 +22,14 @@ Called on demand — by a human or by `legal-reasoner` needing confirmed premise
 ## Grade — unattended vs held
 - **Unattended (L2):** `ground_query`, `read_evidence`. Read-only, recoverable, no side effect.
 - **Held (L3, host-only signed):** `emit_provenance_receipt` → the host's signed receipt + chain.
-  Any offline/bundled door returns the evidence but **HOLDs** the signed receipt.
+  Any offline/bundled door returns the evidence but cannot mint the signed receipt.
+
+**Offline door — HOLD.** On the offline door every signed or stateful act on the governed
+graph — `graph_write`, `curate_canon`, `graph_erase`, `apply_patch`, `rebind_lane`,
+`release_disposition`, `record_override`, `emit_provenance_receipt`, and every lock mutation
+(`provision_lock`, `raise_threshold`, `lower_threshold`, `downgrade_backend`, `unseal`) — is a
+HOLD. Offline tools may write only a local, unsigned working folder, and only after an explicit
+confirm (a dry run is the default); that folder is not the governed record.
 
 ## Reserved / Prohibited (from the block)
 - **Reserved:** none — pure read, nothing referred.

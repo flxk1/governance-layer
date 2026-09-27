@@ -1,7 +1,7 @@
 # Auditor
 
 **ID:** auditor
-**Skill:** the enforcement host's read-only audit interface (over the signed chain)
+**Skill:** no public skill identified; tool `audit_chain_verify` + the enforcement host's read-only audit interface (over the signed chain)
 **Owner:** Felix (flxk1)
 **Autonomy grade:** L2 — reads/verifies run unattended; it mutates nothing enforceable
 **Last reviewed:** 2026-09-04
@@ -27,6 +27,13 @@ verify can be scheduled, but the auditor performs no remediation.
 - **Unattended (L2):** all reads — `verify_chain`, `tail_chain`, `get_event`, `shadow_scan`, `discipline`.
 - **Held (host-only, signed):** `record_override` — one attributed override event to the chain; a
   fail-closed HOLD on any offline/bundled path.
+
+**Offline door — HOLD.** On the offline door every signed or stateful act on the governed
+graph — `graph_write`, `curate_canon`, `graph_erase`, `apply_patch`, `rebind_lane`,
+`release_disposition`, `record_override`, `emit_provenance_receipt`, and every lock mutation
+(`provision_lock`, `raise_threshold`, `lower_threshold`, `downgrade_backend`, `unseal`) — is a
+HOLD. Offline tools may write only a local, unsigned working folder, and only after an explicit
+confirm (a dry run is the default); that folder is not the governed record.
 
 ## Reserved / Prohibited (from the block)
 - **Reserved:** none — pure read + attributed override-logging; nothing enacted.
