@@ -16,11 +16,13 @@ capabilities.
 |-------|-----------|------------|
 | **ctrl** (`ctrl:legal`) | orchestrates the matter — intake, mode, dispatch, report | sign, gate, decide the verdict |
 | **enforcement** (this layer) | GOVERNS — plans + gates every consequential act, chains it, mints/erases | ground a claim; dispose a reserved act |
-| **loomground** (public skills) | grounds/reasons/builds — the capabilities | carry governance identity (no grade, no gate) |
+| **loomground** (public skills) | grounds/reasons/builds — the capabilities, each declaring its own governance block | grade, gate, or decide a verdict itself |
 
-The loomground skills state their own boundary: each is a *capability skill* that "carries no
-governance identity — no grade, no governance-block, no decision-authority." This layer supplies
-that identity by binding a **governance-block** to each and having an enforcement host enforce it.
+Every shipped loomground skill declares its own governance block. A governed **ROLE**, in this
+layer, is one of those skills whose block this layer **compiles, registers, and binds to host
+doors**: this layer's compiler turns the declared block into the schema-valid SKILL.md package,
+the agent-registry records it, and an enforcement host enforces it (a signed decision gate,
+grading, and the decision authority itself live in the host, not in the skill alone).
 
 ---
 

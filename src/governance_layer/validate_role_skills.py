@@ -82,7 +82,7 @@ def validate_root(root: Path) -> tuple[bool, list[str], str]:
         fm = yaml.safe_load(_frontmatter(src)) or {}
         block = fm.get("governance")
         if block is None:
-            lines.append(f"FAIL {skill.parent.name}: no governance block")
+            lines.append(f"FAIL {skill.parent.name}: missing `governance:` key in frontmatter")
             ok = False
             continue
         errs = sorted(jsonschema.Draft202012Validator(schema).iter_errors(block),

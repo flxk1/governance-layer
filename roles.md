@@ -1,12 +1,14 @@
 # roles.md — the skill→role transition (governance layer)
 
 ctrl orchestrates · **an enforcement host governs (this layer)** · Loomground grounds.
-A loomground skill is *universal* and carries **no governance identity**. A **ROLE** = that
-skill + a **governance-block** (skill-governance-block v0.1 schema). An enforcement host
-**enforces** the block (a signed decision gate + hash-chain + receipts); the
-**agent-registry records** it. One declaration → reader plans on it, enforcer verdicts on it.
-"Loomground is universal; via an enforcement host and ctrl:legal these skills become governance
-capabilities."
+Every shipped Loomground skill **declares its own governance block** (skill-governance-block
+v0.1 schema). A **ROLE**, in this layer, is one of those skills whose block this layer
+**compiles, registers, and binds to host doors**: an enforcement host **enforces** the block
+(a signed decision gate + hash-chain + receipts); the **agent-registry records** it. One
+declaration → reader plans on it, enforcer verdicts on it.
+"Loomground skills each carry their own governance block; via an enforcement host and ctrl:legal
+this layer compiles, registers, and binds that block to host doors, turning the skill into a
+governed role."
 
 ## Dual transport (per role, every function)
 - **Offline/bundled skill door** — portable, **CANNOT sign**; no signed act is performed on
