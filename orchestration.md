@@ -1,12 +1,10 @@
 # orchestration — the governance orchestrator + ctrl:legal seam
 
-Plane: **enforcement = GOVERNANCE**. This file declares the loop that turns UNIVERSAL loomground
-skills into GOVERNED ROLES and runs them under an enforcement host's gate. ctrl orchestrates the
-vertical; the enforcement host governs each consequential act; loomground skills are the
-capabilities.
-
-> Loomground is universal; via an enforcement host and ctrl:legal these skills become governance
-> capabilities.
+Plane: **enforcement = GOVERNANCE**. This file declares the loop that runs loomground skills as
+GOVERNED ROLES under an enforcement host's gate. Every shipped loomground skill declares its own
+governance block; a role in this layer is a skill whose block the layer compiles, registers and
+binds to host doors. ctrl orchestrates the vertical; the enforcement host governs each
+consequential act; loomground skills are the capabilities.
 
 ---
 
