@@ -10,16 +10,22 @@ capabilities."
 
 ## Dual transport (per role, every function)
 - **Offline/bundled skill door** — portable, **CANNOT sign**; no signed act is performed on
-  this path. Its one stateful write is versum's: the `loomground-mcp` offline path for versum's
-  write tools (`versum_capture`, `versum_confirm`, `versum_canon`) defaults to a dry run — it
-  reports what would be written and writes nothing — and writes only when called with the
-  explicit `confirm=True` argument. That flag is an unsigned, in-process confirmation, not a
-  signature, a hash-chained mutation-log entry, or a signed receipt.
+  this path. For versum's write tools (`versum_capture`, `versum_confirm`, `versum_canon`) the
+  explicit confirm named below is the `loomground-mcp` tool's `confirm=True` argument, and it
+  writes only the local working folder: an unsigned, in-process flag, not a signature, a
+  hash-chained mutation-log entry, or a signed receipt.
 - **Host-connected door** — the enforcement host's own interface, authoritative, **signed**.
 - **Host-only acts** (the offline path cannot perform them): gate a released
   disposition · append to the chain · mint/verify a receipt · erase — each requires the host's
   signed decision gate, its hash-chained mutation log, its signed receipts, and its signed
   tombstone erasure, respectively.
+
+**Offline door — HOLD.** On the offline door every signed or stateful act on the governed
+graph — `graph_write`, `curate_canon`, `graph_erase`, `apply_patch`, `rebind_lane`,
+`release_disposition`, `record_override`, `emit_provenance_receipt`, and every lock mutation
+(`provision_lock`, `raise_threshold`, `lower_threshold`, `downgrade_backend`, `unseal`) — is a
+HOLD. Offline tools may write only a local, unsigned working folder, and only after an explicit
+confirm (a dry run is the default); that folder is not the governed record.
 
 Verdict vocabulary (skill-governance-block SPEC §3, the Loomground join): **auto / human /
 reserved / prohibited**, joined strictest-wins (`prohibited > reserved > refused > human > auto`).
@@ -67,6 +73,7 @@ governance:
 - **Host-only (signed):** `emit_provenance_receipt` → the host's signed receipt + chain; the
   offline door returns the evidence but cannot mint the signed receipt.
 - **Offline door:** portable read + ground-or-escalate; fully usable offline, signs nothing.
+  `emit_provenance_receipt` is a HOLD.
 
 ---
 
@@ -117,7 +124,8 @@ governance:
   a Loomground verdict (`auto/human/reserved/prohibited`), and on `auto` an audit-triple receipt
   to the chain. A reserved quorum action is held/`reserved` until distinct-party sign-off.
 - **Offline door:** emits the warranted conclusion / `.lg` patch as **provisional (unsigned)**;
-  releasing a disposition is host-only — the offline path cannot sign or gate.
+  releasing a disposition is host-only — `release_disposition` is a HOLD; the offline path
+  cannot sign or gate.
 
 ---
 
@@ -170,14 +178,12 @@ governance:
     chain) + an **Ed25519 signature** (over canonical-content|prev_hash) → verifiable receipt.
   - `graph_erase` → the host's **erasure sweep** → **one signed composite tombstone**, reserved to
     a distinct-party human pair.
-- **Offline door:** ingest **dry-run**, concept extraction, placement **proposals**. For
-  `graph_write` / `curate_canon`, the `loomground-mcp` offline path for versum's write tools
-  (`versum_capture`, `versum_confirm`, `versum_canon`) defaults to a dry run — it reports
-  what would be written and writes nothing — and writes only when called with the explicit
-  `confirm=True` argument. That flag is an unsigned, in-process confirmation that prevents an
-  accidental write; it is not a signature, a hash-chained mutation-log entry, or a signed
-  receipt. The offline door cannot append to the chain, sign, or mint a tombstone —
-  `graph_erase` stays host-only.
+- **Offline door:** ingest **dry-run**, concept extraction, placement **proposals**.
+  `graph_write`, `curate_canon` and `graph_erase` are a HOLD: the offline door cannot append to
+  the chain, sign, or mint a tombstone. versum's write tools (`versum_capture`,
+  `versum_confirm`, `versum_canon`) on the `loomground-mcp` offline path dry-run by default; an
+  explicit `confirm=True` writes only a local, unsigned working folder, which is not the
+  governed record and is not a `graph_write`.
 
 ---
 
@@ -226,7 +232,7 @@ governance:
 ```
 - **Host door:** an egress-lock interface (setup/threshold_set/seal/classify/egress_check/ingress_check/audit_query).
 - **Host-only (signed + reserved):** provision/threshold/backend/unseal mutations → signed chain event;
-  the offline door performs none of these mutations. Weakenings are distinct-party reserved.
+  on the offline door every lock mutation is a HOLD. Weakenings are distinct-party reserved.
 - **Offline door:** status + classify + egress/ingress *checks* only; signs nothing, mutates nothing.
 
 ---
@@ -269,6 +275,7 @@ governance:
   plus a policy-declaration interface.
 - **Host-only (signed + reserved):** `apply_patch` → the signed enforce, reserved to the workspace owner.
 - **Offline door:** ground + compile the `.lg` twin + validate — all **provisional**; applying is host-only.
+  `apply_patch` and `rebind_lane` are a HOLD.
 
 ---
 
@@ -305,6 +312,7 @@ governance:
 - **Host door:** a read-only audit interface (verify_chain/tail/get_event/shadow_scan/discipline/overrides/record_override).
 - **The only append** is `record_override` — an attributed, rationale-bearing note; nothing else mutates.
 - **Offline door:** verify + tail + scan; a portable read of the chain. Repairs nothing.
+  `record_override` is a HOLD — the offline door appends nothing to the chain.
 
 ---
 
@@ -357,4 +365,6 @@ governance:
 - **Load-bearing invariants (per SGB §7):** a below-grade action → `human`; a reserved
   action → `reserved` (held until sign-off); a prohibited kind → `prohibited` (severed); an unattached
   obligation withholds release.
+- The obligation invariant of SGB §7(d) — an unattached obligation withholds release — is
+  exercised by a host, not by this compiler or evaluator: obligations attach by declaration.
 ```

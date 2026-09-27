@@ -18,6 +18,17 @@ becomes a governed **role**; **an enforcement host enforces** the block, the age
   (a Loomground verdict — `auto / human / reserved / prohibited`, joined strictest-wins), landed
   on a signed hash-chain, provable by replaying the chain.
 
+**Offline door — HOLD.** On the offline door every signed or stateful act on the governed
+graph — `graph_write`, `curate_canon`, `graph_erase`, `apply_patch`, `rebind_lane`,
+`release_disposition`, `record_override`, `emit_provenance_receipt`, and every lock mutation
+(`provision_lock`, `raise_threshold`, `lower_threshold`, `downgrade_backend`, `unseal`) — is a
+HOLD. Offline tools may write only a local, unsigned working folder, and only after an explicit
+confirm (a dry run is the default); that folder is not the governed record.
+
+The obligation invariant of the skill-governance-block spec (SGB) §7(d) — an unattached
+obligation withholds release — is exercised by a host, not by this compiler or evaluator:
+obligations attach by declaration.
+
 ## Artifacts
 | File | What |
 |---|---|

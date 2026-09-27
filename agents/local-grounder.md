@@ -26,6 +26,13 @@ Called when Felix wants his private knowledge folder to inform his own reasoning
 - **Unattended (L2):** `ground_private`, `read_private_evidence` — local reads only.
 - **Held:** none — it signs nothing and mints no receipt; it has no MCP/product seam to hold.
 
+**Offline door — HOLD.** On the offline door every signed or stateful act on the governed
+graph — `graph_write`, `curate_canon`, `graph_erase`, `apply_patch`, `rebind_lane`,
+`release_disposition`, `record_override`, `emit_provenance_receipt`, and every lock mutation
+(`provision_lock`, `raise_threshold`, `lower_threshold`, `downgrade_backend`, `unseal`) — is a
+HOLD. Offline tools may write only a local, unsigned working folder, and only after an explicit
+confirm (a dry run is the default); that folder is not the governed record.
+
 ## Reserved / Prohibited (from the block)
 - **Reserved:** none — local, private; nothing enacted, nothing crosses.
 - **Prohibited:** `feed_product_grounding`, `write_to_official_versum`, `egress_private_content`, `ship`.

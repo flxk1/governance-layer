@@ -27,11 +27,18 @@ Called on demand — ingest an artifact, curate the canon, run an erasure. No cr
   the host's hash-chained mutation log (SHA-256 `prev_hash` chain) + an Ed25519 signature.
 - **Held (L4, host-only signed):** `graph_erase` → the host's erasure sweep → one signed
   composite tombstone.
-  On the offline door, the `loomground-mcp` path for versum's write tools (`versum_capture`,
-  `versum_confirm`, `versum_canon`) defaults to a dry run — it reports what would be written and
-  writes nothing — and writes only when called with the explicit `confirm=True` argument. That
-  flag is unsigned and in-process, not a signature; the offline door cannot append to the chain,
-  sign, or mint a tombstone.
+
+**Offline door — HOLD.** On the offline door every signed or stateful act on the governed
+graph — `graph_write`, `curate_canon`, `graph_erase`, `apply_patch`, `rebind_lane`,
+`release_disposition`, `record_override`, `emit_provenance_receipt`, and every lock mutation
+(`provision_lock`, `raise_threshold`, `lower_threshold`, `downgrade_backend`, `unseal`) — is a
+HOLD. Offline tools may write only a local, unsigned working folder, and only after an explicit
+confirm (a dry run is the default); that folder is not the governed record.
+
+For versum's write tools (`versum_capture`, `versum_confirm`, `versum_canon`) that explicit
+confirm is the `loomground-mcp` tool's `confirm=True` argument, which writes the local working
+folder only; it is unsigned and in-process, not a signature, and not a `graph_write` or
+`curate_canon`.
 
 ## Reserved / Prohibited (from the block)
 - **Reserved:** `graph_erase` to **distinct parties** {data_protection_officer, workspace_owner};
@@ -59,12 +66,12 @@ Called on demand — ingest an artifact, curate the canon, run an erasure. No cr
 Running amok, the block bounds the blast radius by construction: `direct_write_bypassing_path`,
 `invent_node`, `binary_fetch_in_session` and `unlogged_mutation` are **prohibited** (severed —
 no ungoverned write, no invented node, no unlogged change); `graph_write`/`curate_canon` are
-**L3** (a granted-L2 actor is floored to `human`) and on the offline path a dry run unless the
-caller passes the explicit `confirm=True` argument (an unsigned flag, not a signature);
+**L3** (a granted-L2 actor is floored to `human`) and a HOLD on the offline door;
 `graph_erase` is **L4** *and* **reserved** to a distinct-party human pair (DPO + workspace_owner)
 with `legal_basis_recorded`. The worst it can do unattended is produce **dry-run** ingests,
-concept extractions, and placement **proposals**; offline, a write lands only on an explicit
-`confirm=True`, unsigned, and nothing is erased. Every signed mutation requires an append to the
+concept extractions, and placement **proposals**; offline, nothing reaches the governed graph —
+a confirmed offline write lands only in a local, unsigned working folder, which is not the
+governed record — and nothing is erased. Every signed mutation requires an append to the
 host's hash-chained mutation log;
 every erase requires two distinct humans and a signed tombstone. The 3am answer is acceptable
 *because* write and erase are gated and reserved, not because the role is trusted.

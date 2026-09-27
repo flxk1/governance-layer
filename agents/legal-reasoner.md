@@ -29,6 +29,13 @@ Called on demand with a legal question. No cron.
   yielding a Loomground verdict (`auto / human / reserved / prohibited`), and on `auto` an
   audit-triple receipt to the chain. Any offline/bundled path **HOLDs** — it cannot sign or gate.
 
+**Offline door — HOLD.** On the offline door every signed or stateful act on the governed
+graph — `graph_write`, `curate_canon`, `graph_erase`, `apply_patch`, `rebind_lane`,
+`release_disposition`, `record_override`, `emit_provenance_receipt`, and every lock mutation
+(`provision_lock`, `raise_threshold`, `lower_threshold`, `downgrade_backend`, `unseal`) — is a
+HOLD. Offline tools may write only a local, unsigned working folder, and only after an explicit
+confirm (a dry run is the default); that folder is not the governed record.
+
 ## Reserved / Prohibited (from the block)
 - **Reserved:** `release_disposition` to a **quorum of 2** distinct parties
   {legal_reviewer, policy_owner} (separation of duty) — held/reserved until distinct-party

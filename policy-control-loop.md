@@ -58,6 +58,12 @@ real-time ingest can make policy *known* — it cannot silently change what is *
 - **Two enforcement axes.** The gate governs *who/grade/reserved/prohibited*; `egress_check` governs *what
   content crosses*. Both must pass — the `egress_minimised` obligation binds the second into each action's gate.
 - **Write-nothing audit.** The auditor reports; it cannot repair, mutate the graph, or apply policy.
+- **Offline door — HOLD.** On the offline door every signed or stateful act on the governed
+  graph — `graph_write`, `curate_canon`, `graph_erase`, `apply_patch`, `rebind_lane`,
+  `release_disposition`, `record_override`, `emit_provenance_receipt`, and every lock mutation
+  (`provision_lock`, `raise_threshold`, `lower_threshold`, `downgrade_backend`, `unseal`) — is a
+  HOLD. Offline tools may write only a local, unsigned working folder, and only after an explicit
+  confirm (a dry run is the default); that folder is not the governed record.
 
 ## Build state
 - Built (local): the roles — grounder, legal-reasoner, knowledge-steward (CT1–CT4 egress obligations),

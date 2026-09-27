@@ -90,6 +90,13 @@ SPEC §7's four load-bearing verdicts); whether your specific host's hook actual
 for every action class, and whether egress containment is deployed at its documented tier, are
 per-host facts to verify, not claims this repo can make on your host's behalf.
 
+**Offline door — HOLD.** On the offline door every signed or stateful act on the governed
+graph — `graph_write`, `curate_canon`, `graph_erase`, `apply_patch`, `rebind_lane`,
+`release_disposition`, `record_override`, `emit_provenance_receipt`, and every lock mutation
+(`provision_lock`, `raise_threshold`, `lower_threshold`, `downgrade_backend`, `unseal`) — is a
+HOLD. Offline tools may write only a local, unsigned working folder, and only after an explicit
+confirm (a dry run is the default); that folder is not the governed record.
+
 ## Reserved (a human's act, never the installer's, never the assistant's)
 Anything that **grants authority or changes security posture** stays a reserved act you run, via
 your host's own tooling:

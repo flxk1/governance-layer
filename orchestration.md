@@ -88,17 +88,24 @@ Refusal (**`prohibited`**) is a valid, expected outcome — an unplanned or refu
 Every governance function has two doors. A **signed / stateful / authoritative** act is
 **host-only**; the offline path cannot perform it.
 
+**Offline door — HOLD.** On the offline door every signed or stateful act on the governed
+graph — `graph_write`, `curate_canon`, `graph_erase`, `apply_patch`, `rebind_lane`,
+`release_disposition`, `record_override`, `emit_provenance_receipt`, and every lock mutation
+(`provision_lock`, `raise_threshold`, `lower_threshold`, `downgrade_backend`, `unseal`) — is a
+HOLD. Offline tools may write only a local, unsigned working folder, and only after an explicit
+confirm (a dry run is the default); that folder is not the governed record.
+
 | Function | Offline/bundled skill (portable, CANNOT sign) | Host-connected door (authoritative, signed) |
 |----------|----------------------------------------|-----------------------------------|
-| plan + gate a disposition | evaluates block, returns *advisory* verdict; cannot gate a consequential act | the host's orchestrate call → its signed decision gate (a signed verdict) |
+| plan + gate a disposition | evaluates block, returns *advisory* verdict; the consequential act is a HOLD | the host's orchestrate call → its signed decision gate (a signed verdict) |
 | ground / reason (read) | runs loomground skill locally | the host's grounder / legal / lens interfaces |
-| versum write (capture / confirm / canon) | dry run by default, writes nothing; writes only with the explicit `confirm=True` argument — an unsigned, in-process flag, not a signature, chain entry, or receipt | the host's capture interface → a signed hash-chain append |
-| append to the chain / mint receipt | not performed (cannot sign) | the host's capture / audit interfaces → a signed hash-chain append |
-| erase (signed tombstone) | not performed (cannot sign) | the host's erase interface → controller-key tombstone |
+| versum write (capture / confirm / canon) | HOLD for the governed graph; dry run by default; `confirm=True` writes only a local, unsigned working folder — not the governed record, not a signature, chain entry, or receipt | the host's capture interface → a signed hash-chain append |
+| append to the chain / mint receipt | HOLD (cannot sign) | the host's capture / audit interfaces → a signed hash-chain append |
+| erase (signed tombstone) | HOLD (cannot sign) | the host's erase interface → controller-key tombstone |
 | record the block in registry | drafts the row | the host's contract / policy interfaces |
 | conformity / release check | advisory checklist | the host's conformity interface |
 
-Rule: if it signs, chains, mints a receipt, or erases → host-connected only. Offline/bundled = advise; it performs no signed act.
+Rule: if it signs, chains, mints a receipt, erases, or writes the governed graph → host-connected only; on the offline door it is a HOLD. Offline/bundled = advise; it performs no signed act.
 
 ---
 
