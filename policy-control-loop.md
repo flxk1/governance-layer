@@ -7,7 +7,7 @@ Policy that is **ingested in real time via versum** becomes **known** immediatel
 after a human confirms** the change. KNOW is real-time; ENFORCE-a-change is reserved. A rogue or injected
 real-time ingest can make policy *known* — it cannot silently change what is *enforced*.
 
-## The loop (six stages, mapped to role + host op)
+## The loop (eight stages, mapped to role + host op)
 ```
   (1) INGEST      knowledge-steward   loomground-ingest -> loomground-knowledge-write   -> versum (provenanced, timestamped)
         |                                                                                   [copyright gate precondition, bound]

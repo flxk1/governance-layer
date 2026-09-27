@@ -89,4 +89,4 @@ crossing or shipping grade — the role's value is that it cannot cross.
 90-day. Next review: 2026-12-04.
 
 ---
-*Assisted by Claude (Anthropic); not an author or copyright holder.*
+*The code and documentation are written with Loomground agents. The maintainer reads and corrects all of it.*

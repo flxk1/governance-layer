@@ -89,4 +89,4 @@ layers. `apply_patch` (L4) stays reserved to the workspace owner irrespective of
 90-day. Next review: 2026-12-04.
 
 ---
-*Assisted by Claude (Anthropic); not an author or copyright holder.*
+*The code and documentation are written with Loomground agents. The maintainer reads and corrects all of it.*
