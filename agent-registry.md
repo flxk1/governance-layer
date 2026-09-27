@@ -53,4 +53,4 @@ confirm (a dry run is the default); that folder is not the governed record.
   paragraph, budget caps, and a named kill switch. No 3am paragraph → the role isn't ready.
 
 ---
-*The code and documentation are written with Loomground agents running on Claude (Anthropic). The maintainer reads and corrects all of it.*
+*The code and documentation are written with Loomground agents. The maintainer reads and corrects all of it.*
