@@ -1,7 +1,7 @@
 # Knowledge steward
 
 **ID:** knowledge-steward
-**Skill:** `loomground-versum:loomground-knowledge-write` (tools `ingest_text`, `versum_capture`, `versum_suggest`, `versum_confirm`, `versum_canon`, `erasure_sweep`; no public skill currently serves `erasure_sweep`)
+**Skill:** `loomground-versum:loomground-knowledge-write` (tools `ingest_text`, `versum_capture`, `versum_suggest`, `versum_confirm`, `versum_canon`, `erasure_sweep`, `versum_coords`, `versum_cell`, `nd_resolve`; no public skill currently serves `erasure_sweep`)
 **Owner:** Felix (flxk1)
 **Autonomy grade:** L2 — dry-run/propose runs unattended; write held to L3, erase to L4
 **Last reviewed:** 2026-09-03
@@ -9,6 +9,9 @@
 ## Purpose
 Build and maintain the graph asset: ingest (dry-run) → concepts → placement → **write** →
 curate; enrich; capture-session; **erase**. The one write/erase authority in this layer.
+`versum_coords`/`versum_cell`/`nd_resolve` may return a candidate-tier plane coordinate at
+write/propose time; only verification 'confirmed' counts as grounding — a candidate coordinate is
+explicitly unconfirmed and grounds nothing until `curate_canon` (the curator) confirms it.
 
 ## Scope
 **In scope (why):** `ingest_dryrun`, `extract_concepts` (risk low), `propose_placement`
@@ -44,7 +47,8 @@ folder only; it is unsigned and in-process, not a signature, and not a `graph_wr
 - **Reserved:** `graph_erase` to **distinct parties** {data_protection_officer, workspace_owner};
   `curate_canon` to `curator`.
 - **Prohibited:** `direct_write_bypassing_path`, `binary_fetch_in_session`, `invent_node`,
-  `unlogged_mutation`.
+  `unlogged_mutation`, `present_candidate_as_confirmed` (a candidate-tier plane coordinate is
+  never presented or asserted as confirmed).
 - **On boundary:** quarantine-or-review-queue — ingest quarantines; organise leaves
   novel/low-overlap unfiled; never guess a home.
 

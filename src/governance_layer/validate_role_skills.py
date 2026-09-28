@@ -37,18 +37,40 @@ def _frontmatter(text: str) -> str:
     return text[3:end] if end != -1 else ""
 
 
-# Every name a role's `allowed-tools` may carry: confirmed, read-only, against
-# loomground-mcp/src/loomground_mcp/tools/*.py (function name == served MCP tool name) at the
-# commit checked for this port. A tool absent from this set fails validation rather than being
-# silently accepted (build_role_skills.py is the single source of the per-role grant; this list is
-# the corresponding single source of "exists and is served").
+# Every tool actually served by loomground-mcp: the exact set of `def` names decorated with
+# `@tool(...)` under loomground-mcp/src/loomground_mcp/tools/*.py (function name == served MCP
+# tool name), read at commit 0c58061f8ae9df89d02784edd512d96ab94beadf of flxk1/loomground-mcp.
+# This is the FULL server tool set, not a per-role allowlist — a role's own `tools` grant
+# (build_role_skills.ROLES) is the separate, narrower single source of what that role gets; this
+# set is only "does this name exist and get served at all". A tool absent from this set fails
+# validation rather than being silently accepted.
+#
+# Re-derivable with (stdlib-only, run against a loomground-mcp checkout):
+#   python3 -c "
+#   import ast, pathlib
+#   names = sorted(
+#       node.name
+#       for f in pathlib.Path('src/loomground_mcp/tools').glob('*.py')
+#       for node in ast.walk(ast.parse(f.read_text(), filename=str(f)))
+#       if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+#       for dec in node.decorator_list
+#       if isinstance(dec, ast.Call) and isinstance(dec.func, ast.Name) and dec.func.id == 'tool'
+#   )
+#   print(names)"
 SERVED_TOOLS = frozenset({
-    "versum_search", "versum_claims", "ingest_text", "versum_capture", "versum_suggest",
-    "versum_confirm", "versum_canon", "erasure_sweep", "solver_evaluate", "solver_verify",
-    "solver_manifest", "solver_analyse_risks", "solver_estimate_liability", "solver_litigation_risk",
-    "solver_opponent_model", "solver_probability", "solver_strategy", "solver_advise_addons",
-    "policy_compile", "policy_check", "lane_evaluate", "deontic_parse", "deontic_conflicts",
-    "lock_text", "privacy_scan", "audit_chain_verify",
+    "a2a_admission_preview", "a2a_ground", "a2a_plan", "a2a_reconcile",
+    "audit_chain_verify", "brief", "collapse", "deontic_conflicts", "deontic_parse",
+    "drift_breaker", "effect_reconcile", "enforcement_compare", "epistemic_extract",
+    "erasure_sweep", "escalation", "evidence_emit", "evidence_verify", "factual_lower",
+    "falsifiability", "govcert_verify", "ingest_text", "lane_evaluate", "lock_text",
+    "loomground_catalogue", "loomground_releases", "loomground_skill", "mandate",
+    "nd_digest", "nd_resolve", "norm_extract", "norm_freshness", "obligation_admit",
+    "oversight_issue", "oversight_verify", "policy_check", "policy_compile", "privacy_scan",
+    "proxy", "solver_advise_addons", "solver_analyse_risks", "solver_estimate_liability",
+    "solver_evaluate", "solver_litigation_risk", "solver_manifest", "solver_opponent_model",
+    "solver_probability", "solver_strategy", "solver_verify", "topos_parse",
+    "versum_canon", "versum_capture", "versum_cell", "versum_claims", "versum_confirm",
+    "versum_coords", "versum_index", "versum_search", "versum_suggest",
 })
 
 # Tools whose only effect is a write/mutate/erase kind — never granted to a role whose block

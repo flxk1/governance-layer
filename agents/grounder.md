@@ -1,13 +1,17 @@
 # Grounder
 
 **ID:** grounder
-**Skill:** `loomground-versum:loomground-kg-chat` (tools `versum_search`, `versum_claims`)
+**Skill:** `loomground-versum:loomground-kg-chat` (tools `versum_search`, `versum_claims`,
+`versum_coords`, `versum_cell`, `nd_resolve`)
 **Owner:** Felix (flxk1)
 **Autonomy grade:** L2 — read-only serve runs unattended; the signed receipt is held to L3
 **Last reviewed:** 2026-09-03
 
 ## Purpose
 Return evidence-at-coordinate + provenance, or ground-or-escalate. Serves; never writes.
+`versum_coords`/`versum_cell`/`nd_resolve` may return a candidate-tier plane coordinate; only
+verification 'confirmed' counts as grounding — a candidate coordinate is explicitly unconfirmed
+and grounds nothing until a curator (`knowledge-steward`'s `curate_canon`) confirms it.
 
 ## Scope
 **In scope (why):** `ground_query`, `read_evidence` (risk low) — pure reads over the confirmed
@@ -34,7 +38,8 @@ confirm (a dry run is the default); that folder is not the governed record.
 ## Reserved / Prohibited (from the block)
 - **Reserved:** none — pure read, nothing referred.
 - **Prohibited:** `graph_write`, `binary_fetch`, `fabricate_citation` (ground-or-escalate: no
-  invented cite/version/reach), `answer_from_model_memory`.
+  invented cite/version/reach), `answer_from_model_memory`, `assert_unconfirmed_coordinate_as_confirmed`
+  (a candidate-tier plane coordinate is never asserted or served as confirmed).
 - **On boundary:** escalate-with-named-axis — citation won't parse / reach contested / version
   undetermined / no confirming source → STOP and name the failed axis.
 

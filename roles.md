@@ -36,7 +36,8 @@ Grade ladder L0<…<L6.
 ---
 
 ## ROLE 1 — `grounder`  (skill: `loomground-versum:loomground-kg-chat`)
-Public skill: `loomground-versum:loomground-kg-chat`. Tools: `versum_search`, `versum_claims`.
+Public skill: `loomground-versum:loomground-kg-chat`. Tools: `versum_search`, `versum_claims`,
+`versum_coords`, `versum_cell`, `nd_resolve`.
 Read-only evidence-at-coordinate + provenance, or ground-or-escalate. Serves; never writes.
 
 ```
@@ -49,7 +50,11 @@ governance:
   grounding-access:
     mode: read
     slice: coordinate = jurisdiction x source-class x point-in-time   # the legal profile axes
-    bar: CONFIRMED-only            # graph-confirmed at coordinate; absence -> unconfirmed, never false-positive
+    bar: CONFIRMED-only            # graph-confirmed at coordinate; absence -> unconfirmed, never false-positive.
+                                    # versum_coords/versum_cell/nd_resolve may return a candidate-tier plane
+                                    # coordinate; a candidate is explicitly UNCONFIRMED and grounds nothing —
+                                    # only verification 'confirmed' counts as grounding, until a curator
+                                    # (knowledge-steward's curate_canon) confirms it.
     point-in-time: Level-1 (enactment/consolidation) precision; state the precision used
   obligations:
     - provenance_attached          # source URN + graph level + temporal precision on every answer
@@ -59,12 +64,14 @@ governance:
     - egress_checked               # release passes the lock's egress_check
     - egress_payload_moat_safe     # nothing that would leak the private/curated moat leaves
     - ingress_checked              # imported evidence passes ingress_check before it grounds
+    - confirmed_coordinate_only    # a candidate-tier coordinate (versum_coords/versum_cell/nd_resolve) grounds nothing until confirmed
   prohibited:
     - graph_write                  # grounding never writes (that is knowledge-steward)
     - binary_fetch
     - fabricate_citation           # ground-or-escalate: no invented cite/version/reach
     - answer_from_model_memory
     - ground_from_private_folder   # the product NEVER grounds on Felix's private folder (that is local-grounder, local-only)
+    - assert_unconfirmed_coordinate_as_confirmed   # a candidate coordinate is never asserted/served as confirmed
   reserved: []                     # pure read; nothing referred
   on-boundary: escalate-with-named-axis   # citation won't parse / reach contested / version undetermined / no confirming source -> STOP, name the failed axis
   redress:
@@ -133,8 +140,8 @@ governance:
 
 ## ROLE 3 — `knowledge-steward`  (skill: `loomground-versum:loomground-knowledge-write`)
 Public skill: `loomground-versum:loomground-knowledge-write`. Tools: `ingest_text`,
-`versum_capture`, `versum_suggest`, `versum_confirm`, `versum_canon`, `erasure_sweep` (no public
-skill currently serves `erasure_sweep`).
+`versum_capture`, `versum_suggest`, `versum_confirm`, `versum_canon`, `erasure_sweep`,
+`versum_coords`, `versum_cell`, `nd_resolve` (no public skill currently serves `erasure_sweep`).
 Build/maintain the graph asset: ingest (dry-run) → concepts → placement → **write** → curate; enrich;
 loomground-capture:capture-session; **erase**. The one write/erase authority in this layer.
 
@@ -150,7 +157,10 @@ governance:
     - { kind: graph_erase,         risk: critical, grade: L4 }    # MCP-only (signed tombstone)
   grounding-access:
     mode: write (single governed write path only)
-    slice: candidate layer on write; confirmed layer minted only by curate
+    slice: candidate layer on write; confirmed layer minted only by curate — a coordinate returned
+           by versum_coords/versum_cell/nd_resolve at write/propose time is candidate-tier and
+           explicitly UNCONFIRMED; only verification 'confirmed' counts as grounding, and a
+           candidate grounds nothing until curate_canon (the curator) confirms it
     bar: invent-nothing; missing context recorded incomplete, never false; low-overlap -> review queue
     point-in-time: every written span/node carries a fetch/validity timestamp
   obligations:
@@ -160,11 +170,13 @@ governance:
     - legal_basis_recorded         # on erase (GDPR)
     - egress_checked               # any mirror/export of the graph passes the lock's egress_check
     - erase_egress_limit_disclosed # state what a signed tombstone can and cannot reach downstream
+    - candidate_not_confirmed_until_curated  # a candidate-tier coordinate never counts as confirmed grounding before curate_canon
   prohibited:
     - direct_write_bypassing_path
     - binary_fetch_in_session
     - invent_node
     - unlogged_mutation            # every write is a chain event
+    - present_candidate_as_confirmed  # a candidate-tier coordinate is never presented/asserted as confirmed
   reserved:
     - { kind: graph_erase, by: { all: [data_protection_officer, workspace_owner] } }   # erase referred to humans, distinct parties
     - { kind: curate_canon, by: curator }
