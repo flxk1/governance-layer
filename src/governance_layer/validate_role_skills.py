@@ -43,7 +43,8 @@ def _frontmatter(text: str) -> str:
 # silently accepted (build_role_skills.py is the single source of the per-role grant; this list is
 # the corresponding single source of "exists and is served").
 SERVED_TOOLS = frozenset({
-    "versum_search", "versum_claims", "ingest_text", "versum_capture", "versum_suggest",
+    "versum_search", "versum_claims", "versum_coords", "versum_cell", "nd_resolve",
+    "ingest_text", "versum_capture", "versum_suggest",
     "versum_confirm", "versum_canon", "erasure_sweep", "solver_evaluate", "solver_verify",
     "solver_manifest", "solver_analyse_risks", "solver_estimate_liability", "solver_litigation_risk",
     "solver_opponent_model", "solver_probability", "solver_strategy", "solver_advise_addons",

@@ -1,8 +1,8 @@
 ---
 name: knowledge-steward
 description: "Build and maintain the graph: ingest, concepts, placement, write, curate; enrich; erase. The one write/erase authority. Use when material must enter, be curated in, or be erased from the graph — 'ingest this', 'add what we learned to the graph', 'curate the concepts', 'erase this subject'."
-allowed-tools: ingest_text, versum_capture, versum_suggest, versum_confirm, versum_canon, erasure_sweep
-metadata: { provenance: { stamp: "tool=governance-layer version=0.1.0 input_sha256=05ee243107fa4eef95ed84ef9d82393975a2aa08e833e1f0cd5d2722aaa6d09b" } }
+allowed-tools: ingest_text, versum_capture, versum_suggest, versum_confirm, versum_canon, erasure_sweep, versum_coords, versum_cell, nd_resolve
+metadata: { provenance: { stamp: "tool=governance-layer version=0.1.0 input_sha256=679636310a42b48ad673809faa00d4f044253507902444fc609f7466863b6783" } }
 governance:
   grade: L2
   actions:
@@ -20,6 +20,7 @@ governance:
     - binary_fetch_in_session
     - invent_node
     - unlogged_mutation
+    - present_candidate_as_confirmed
   obligations:
     - single_write_path
     - dry_run_then_confirm
@@ -27,6 +28,7 @@ governance:
     - legal_basis_recorded
     - egress_checked
     - erase_egress_limit_disclosed
+    - candidate_not_confirmed_until_curated
   redress:
     - { kind: graph_erase, by: subject, overturn: false, within: 30d }
     - { kind: graph_write, by: workspace_owner, overturn: true }

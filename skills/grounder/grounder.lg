@@ -1,5 +1,5 @@
 # grounder.lg — compiled from the governance block (SPEC §4). Generated; do not edit by hand.
-# stamped: tool=governance-layer version=0.1.0 input_sha256=e8ef3f55db33fb3c78c6d4b12722488961b044cdc9cb6798e30e408efe024563
+# stamped: tool=governance-layer version=0.1.0 input_sha256=ab92c22cfc30f8a3be5f4303bf772fc62e690368c52c5e063b8f89cedafeccc0
 human reviewer role reviewer
 actor grounder grade L2
 
@@ -19,6 +19,7 @@ prohibit binary_fetch
 prohibit fabricate_citation
 prohibit answer_from_model_memory
 prohibit ground_from_private_folder
+prohibit assert_unconfirmed_coordinate_as_confirmed
 obligation provenance_attached on ground_query
 obligation provenance_attached on read_evidence
 obligation provenance_attached on emit_provenance_receipt
@@ -40,4 +41,7 @@ obligation official_versum_only on emit_provenance_receipt
 obligation completeness_asserted on ground_query
 obligation completeness_asserted on read_evidence
 obligation completeness_asserted on emit_provenance_receipt
+obligation confirmed_coordinate_only on ground_query
+obligation confirmed_coordinate_only on read_evidence
+obligation confirmed_coordinate_only on emit_provenance_receipt
 redress disputed_grounding by reviewer overturn

@@ -1,8 +1,8 @@
 ---
 name: grounder
 description: "Read-only evidence at coordinate + provenance, or ground-or-escalate. Serves; never writes. Product grounder — official versum only. Use when a claim must be grounded against the official versum — 'ground this', 'is this in the corpus', 'give me the source for X at date D', 'confirm this against the graph'."
-allowed-tools: versum_search, versum_claims
-metadata: { provenance: { stamp: "tool=governance-layer version=0.1.0 input_sha256=e7ec7d211acafb7d9ce55498bfd18502cd2e51a9e6f75d3aea35a25a8c1d2ed1" } }
+allowed-tools: versum_search, versum_claims, versum_coords, versum_cell, nd_resolve
+metadata: { provenance: { stamp: "tool=governance-layer version=0.1.0 input_sha256=a7bc91b5eae1276433430c68095e2240ecbbf89c3a226699f8906c66c212472d" } }
 governance:
   grade: L2
   actions:
@@ -16,6 +16,7 @@ governance:
     - fabricate_citation
     - answer_from_model_memory
     - ground_from_private_folder
+    - assert_unconfirmed_coordinate_as_confirmed
   obligations:
     - provenance_attached
     - coordinate_pinned
@@ -24,6 +25,7 @@ governance:
     - ingress_checked
     - official_versum_only
     - completeness_asserted
+    - confirmed_coordinate_only
   redress:
     - { kind: disputed_grounding, by: reviewer, overturn: true }
   budget: { usd: 1, iters: 20 }
